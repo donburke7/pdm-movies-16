@@ -1,8 +1,7 @@
 //all needed imports to do the appropriate things
 import java.util.Scanner;
 
-import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.RuntimeCryptoException;
-
+import java.sql.SQLException;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import java.io.BufferedReader;
