@@ -100,6 +100,7 @@ public class MovieSearch {
                         "       m.\"MPAA_rating\",\n" +
                         "       CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\"\n" +
                         "FROM movie m\n" +
+                        "JOIN releases r ON m.\"movieID\" = r.\"movieID\"\n" +
                         "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
                         "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
                         "WHERE m.title ILIKE ?" +
@@ -158,6 +159,27 @@ public class MovieSearch {
                                 "order by m.\"title\", r.\"releaseDate\""
                 );
                 preparedStatement.setInt(1, queryIntVar);
+                break;
+            case 3:
+                System.out.println("Enter the year");
+                int year = scanner.nextInt();
+                System.out.println("Enter the month");
+                int month = scanner.nextInt();
+                System.out.println("Enter the day");
+                int day = scanner.nextInt();
+
+                preparedStatement = connection.prepareStatement(
+                        "SELECT  m.title,\n" +
+                                "        m.length,\n" +
+                                "        m.\"MPAA_rating\",\n" +
+                                "        CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\"\n" +
+                                "FROM movie m\n" +
+                                "JOIN releases r ON m.\"movieID\" = r.\"movieID\"\n" +
+                                "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
+                                "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
+                                "where \"releaseDate\" = ? order by m.\"title\", r.\"releaseDate\""
+                );
+                preparedStatement.setDate(1, Date.valueOf(year + "-" + month + "-" + day));
                 break;
             default:
                 System.out.println("Not a valid option");
