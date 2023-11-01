@@ -27,26 +27,49 @@ public class collections {
         increment++;
 
         //prompt for the name of the collection
-        String name="";
+        String collectionName="";
         System.out.println("Enter a name for your collection: ");
         String nameInput = scanner.nextLine();
 
         //check name for null
         if( nameInput.isEmpty()){
-            name="collection";
+            collectionName="collection";
         }else{
-            name=nameInput;
+            collectionName=nameInput;
         }
+
+        //at this point, collecitonID, userID, and name are known
+        //sql statment to create colleciton
+        //INSERT INTO "Collection" Values(collectionID, userID, collectionName)
+
         
-        System.out.println("you created a collection of name: "+ name+", with a collection id of: "+collectionID);
     }
+    
     static int generateID(){
         int ID=startID+increment;
         return ID; 
     }
-    static void viewCollections(){}
-    static void deleteCollection(){}
-    static void modifyCollection(){}
+
+    /**
+     * Users will be able to see the list of all their collections of movies 
+     * IN ASCENDING ORDER 
+     * Collections name
+     * number of movies in the collections
+     */
+    static void viewCollections(int userID){
+        
+        System.out.println("Here is a list of your collections:\n");
+
+    }
+    static void deleteCollection(int userID){
+        System.out.println("Enter the name of the collection you would like to delete: ");
+        String collectionName=scanner.nextLine();
+        //sql command 
+        //Delete From "Collection", "Contains" WHERE collectionName = collectionName
+    }
+    static void modifyCollection(){
+        
+    }
     static void addMovie(){}
     static void deleteMovie(){}
 
@@ -58,7 +81,11 @@ public class collections {
             command=printMenu();
         }else if (command == 1){
             createCollection(userID);
-            createCollection(userID);
+           
+        }else if (command == 2){
+            viewCollections(userID);
+        }else if (command == 3){
+            deleteCollection(userID);
         }
 
     }
