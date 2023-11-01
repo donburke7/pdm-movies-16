@@ -29,10 +29,12 @@ public class collections {
 
     }
     static void createCollection(int userID){
+        int lport = 5432; 
+        String rhost = "starbug.cs.rit.edu";
         //generate next CollectionID
         int collectionID=generateID(); 
         
-
+        
         //prompt for the name of the collection
         String collectionName="";
         System.out.println("Enter a name for your collection: ");
