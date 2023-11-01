@@ -1,10 +1,17 @@
+//all needed imports to do the appropriate things
 import java.util.Scanner;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.*;
+
 
 public class collections {
     //extend serenas file and use getter to get userID
     static Scanner scanner = new Scanner(System.in);
-    static int increment=0;
-    static int startID=200; 
+     
 
     static int printMenu() {
         System.out.println("\nWelcome to the collections menu!");
@@ -24,7 +31,7 @@ public class collections {
     static void createCollection(int userID){
         //generate next CollectionID
         int collectionID=generateID(); 
-        increment++;
+        
 
         //prompt for the name of the collection
         String collectionName="";
@@ -46,8 +53,9 @@ public class collections {
     }
     
     static int generateID(){
-        int ID=startID+increment;
-        return ID; 
+        //Select collectionID from Collections where collectionID=MAX(collectionID)
+        return 0;
+        //return ID; 
     }
 
     /**
