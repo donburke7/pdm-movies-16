@@ -1,3 +1,4 @@
+package main.java;
 import java.util.Scanner;
 import java.io.*;
 import java.sql.*;
@@ -22,19 +23,63 @@ public class accounts {
     public static int userID = -1;
     public static int incrementUserID = 1001;
     static Statement stmt;
+    public static boolean loginChecker;
+
+    public static void printBeginMenu(){
+        System.out.println("Welcome to the Movies Database!");
+        System.out.println("Please sign in or create account with commands: \n");
+        
+        System.out.println("0: Login to your account");
+        System.out.println("1: Create account");
+        System.out.println("9: Quit Application");
+        System.out.println("Please enter corresponding number to command you wish to perform:");
+
+        int input = Integer.parseInt(sc.nextLine());
+        while(input != 0 && input != 1 && input != 9){
+            System.out.println("Please enter valid number of command you wish to perform: \n");
+            System.out.println("0: Login to your account");
+            System.out.println("1: Create account");
+            System.out.println("9: Quit Application");
+            input = Integer.parseInt(sc.nextLine());
+        }
+        if(input == 1){
+            createAccount();
+        }
+        else if(input == 0){
+            Login();
+        }
+        else if(input == 9){
+            System.out.println("Cloing Appplication now :)");
+        }
+        
+    }
+
+    public static void printMainMenu(){
+        System.out.println("You are now logged in! Find below more functionality:\n");
+
+        System.out.println("2: Access and Edit Collections"); 
+        System.out.println("3: Search for Movies");
+        System.out.println("4: Rate Movies");
+        System.out.println("5: Watch Movies");
+        System.out.println("6: Follow other Users");
+        System.out.println("7: Logout");
+
+
+    }
 
 
     public static boolean isLogin(){
         if (userID!= -1){
-            return true;
+            loginChecker = true;
         }
         else{
-            return false;
+            loginChecker = false;
         }
+        return loginChecker;
     }
 
     public static void Login(){
-      
+        System.out.println("Welcome to login. Please enter credentials below: \n");
         System.out.println("Enter username:");
         String username = sc.nextLine();
         System.out.println("Enter password:");
@@ -46,23 +91,27 @@ public class accounts {
             while(rset.next()){
                 tempID = rset.getInt("userID");
                 userID = tempID;
-                System.out.println(userID);
+                
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            // UPDATE "Users" SET lastAccess = currentTime
-            // where userID = userID
+            String updateLastAccess = "update users set \"lastAccess\" = '" + currentTime +"' where \"userID\" = " + userID;
+            stmt.executeUpdate(updateLastAccess); 
+            isLogin();
+            printMainMenu();
+
         }
         catch(SQLException e){
-            System.out.println(e.getErrorCode());
+            System.out.println("Could not login - try again or create an account");
+            printBeginMenu();
         }
     }
-        // else{
-        //     System.out.println("Could not login - try again or create an account");
-        // }
-    
+    public static void Logout(){
+        userID = -1;
+        loginChecker = false;
+    }
 
     public static void createAccount(){
-        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        System.out.println("Welcome to Account Creation. Please enter credentials below: \n");
         System.out.println("Please enter first name:");
         String firstName = sc.nextLine();
         System.out.println("Please enter last name:");
@@ -71,12 +120,14 @@ public class accounts {
         String username = sc.nextLine();
         System.out.println("Please enter new password:");
         String password = sc.nextLine();
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         String insertNewUser = "insert into users values ("+ incrementUserID+",'"+ username +"', '"+ password +"', '"+ firstName +"', '"+ lastName +"', '"+currentTime+"',"+ null + ")";
         System.out.println("SQL IS "+ insertNewUser);
         try {
             stmt.executeUpdate(insertNewUser);
-            System.out.println("Your account has been created, please sign in to see other functionality");
             incrementUserID++;
+            System.out.println("Your account has been created, please sign in to see other functionality");
+            printBeginMenu();
         } catch (SQLException e) {
             // prompt to reenter new username
             e.printStackTrace();
@@ -133,8 +184,11 @@ public class accounts {
 
             stmt = conn.createStatement();
             // createAccount();
-            Login();
-            System.out.println(isLogin());
+            // Login();
+            // System.out.println(isLogin());
+            System.out.println(incrementUserID);
+            printBeginMenu();
+            
 
             // Do something with the database....
 
