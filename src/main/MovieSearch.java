@@ -92,34 +92,25 @@ public class MovieSearch {
 
         System.out.println("What is the name of the movie you want to search?");
         String movieName = scanner.next();
-        System.out.println("What is your uid");
-        int uid = scanner.nextInt();
-        System.out.println("Searching for "+ movieName + " for " + uid);
+        System.out.println("Searching for "+ movieName);
 
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT m.title,\n" +
                         "       m.length,\n" +
                         "       m.\"MPAA_rating\",\n" +
-                        "       CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\",\n" +
-                        "       r.rating\n" +
+                        "       CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\"\n" +
                         "FROM movie m\n" +
                         "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
                         "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
-                        "JOIN rates r ON r.\"movieid\" = m.\"movieID\"\n" +
-                        "WHERE m.title ILIKE ?\n" +
-                        "AND r.userid = ?");
+                        "WHERE m.title ILIKE ?");
         preparedStatement.setString(1, "%" + movieName + "%");
-        preparedStatement.setInt(2, uid);
-
-//        System.out.println(preparedStatement);
-
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()) {
-            System.out.printf("runtime:%d title:%s MPAArating=%s director=%s userRating=%d%n", resultSet.getLong("length"),
+            System.out.printf("runtime:%d title:%s MPAArating=%s director=%s%n", resultSet.getLong("length"),
                     resultSet.getString("title"), resultSet.getString("MPAA_rating"),
-                    resultSet.getString("director"), resultSet.getLong("rating"));
+                    resultSet.getString("director"));
         }
     }
 
