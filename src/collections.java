@@ -1,5 +1,8 @@
 //all needed imports to do the appropriate things
 import java.util.Scanner;
+
+import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.RuntimeCryptoException;
+
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import java.io.BufferedReader;
@@ -28,24 +31,87 @@ public class collections {
         return command;
 
     }
-    static void createCollection(int userID){
+    static void createCollection(int userID) throws SQLException{
         int lport = 5432; 
         String rhost = "starbug.cs.rit.edu";
-        //generate next CollectionID
-        int collectionID=generateID(); 
-        
-        
-        //prompt for the name of the collection
-        String collectionName="";
-        System.out.println("Enter a name for your collection: ");
-        String nameInput = scanner.nextLine();
+        int rport = 5432; 
+        String user; 
+        String password; 
 
-        //check name for null
-        if( nameInput.isEmpty()){
-            collectionName="collection";
-        }else{
-            collectionName=nameInput;
+        //get the username and password for logging into the database
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader ("pdm-movies-16/src/main/credentials.txt"))){
+            user = bufferedReader.readLine();
+            password = bufferedReader.readLine();
+        }catch (IOException e){
+            throw new RuntimeException(e);
         }
+
+        String databaseName = "p320_16";
+
+        String driverName = "org.postgresql.Driver";
+
+        Connection conn = null; 
+        Session session = null;
+
+        try{ 
+            java.util.Properties config = new java.util.Properties();
+            config.put("StrictHostKeyChecking", "no");
+            JSch jsch = new JSch();
+            session = jsch.getSession(user, rhost, 22);
+            session.setPassword(password);
+            session.setConfig(config);
+            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+
+            int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
+            String url = "jdbc:postgresql://127.0.0.1:" + assigned_port + "/" + databaseName;
+
+            java.util.Properties props = new java.util.Properties();
+            props.put("user", user);
+            props.put("password", password);
+
+            Class.forName(driverName);
+            conn = DriverManager.getConnection(url, props);
+
+            // PreparedStatement statement = conn.prepareStatement("select * from movie where \"movieID\" = 19995");
+
+            // ResultSet resultSet = statement.executeQuery();
+            
+            PreparedStatement statement = conn.prepareStatement("select MAX(collecitonID) from collection ");
+            ResultSet resultSet = statement.executeQuery();
+
+            System.out.println(resultSet);
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if ( conn != null && !conn.isClosed()){
+                System.out.println("Closing Database Connection");
+                conn.close();
+            }
+            if (session != null && session.isConnected()){
+                System.out.println("Closing SSH Connection");
+                session.disconnect();
+            }
+        }
+
+        
+
+        //generate next CollectionID
+        // int collectionID=generateID(); 
+        
+
+
+        
+        // //prompt for the name of the collection
+        // String collectionName="";
+        // System.out.println("Enter a name for your collection: ");
+        // String nameInput = scanner.nextLine();
+
+        // //check name for null
+        // if( nameInput.isEmpty()){
+        //     collectionName="collection";
+        // }else{
+        //     collectionName=nameInput;
+        // }
 
         //at this point, collecitonID, userID, and name are known
         //sql statment to create colleciton
@@ -90,7 +156,11 @@ public class collections {
         if (command == 0){
             command=printMenu();
         }else if (command == 1){
-            createCollection(userID);
+            try {
+                createCollection(userID);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
            
         }else if (command == 2){
             viewCollections(userID);
