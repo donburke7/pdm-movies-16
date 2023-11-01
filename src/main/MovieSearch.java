@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
+import java.util.Scanner;
 
 public class MovieSearch {
 
@@ -14,7 +15,7 @@ public class MovieSearch {
         int rport =5432;
         String user;
         String password;
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/credentials.txt"))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("dataSources/credentials.txt"))) {
             user = bufferedReader.readLine();
             password = bufferedReader.readLine();
         } catch (IOException e) {
@@ -52,16 +53,39 @@ public class MovieSearch {
             conn = DriverManager.getConnection(url, props);
 //            System.out.println("Database connection established");
 
-            PreparedStatement statement = conn.prepareStatement("select * from movie where \"movieID\" = 19995");
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("What would you like to search by?");
+            System.out.println("1: Movie Name");
+            System.out.println("2: Movie Release Date");
+            System.out.println("3: Cast Member Name");
+            System.out.println("4: Studio Name");
+            System.out.println("5: Genre");
+            int selection = scanner.nextInt();
 
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-//                System.out.println(resultSet.getString("title"));
-                System.out.printf("id:%d runtime:%d title:%s rating=%s%n", resultSet.getLong("movieID"),
-                        resultSet.getLong("length"), resultSet.getString("title"),
-                        resultSet.getString("MPAA_rating"));
+            switch (selection) {
+                case 1:
+                    System.out.println("What is the name of the movie you want to search?");
+                    String movieName = scanner.next();
+                    System.out.println("Searching for "+ movieName);
+                    searchByName(conn, movieName);
+                    break;
+                default:
+                    System.out.println("Invalid input");
             }
+
+
+
+
+//            PreparedStatement statement = conn.prepareStatement("select * from movie where \"movieID\" = 19995");
+//
+//            ResultSet resultSet = statement.executeQuery();
+
+//            while (resultSet.next()) {
+////                System.out.println(resultSet.getString("title"));
+//                System.out.printf("id:%d runtime:%d title:%s rating=%s%n", resultSet.getLong("movieID"),
+//                        resultSet.getLong("length"), resultSet.getString("title"),
+//                        resultSet.getString("MPAA_rating"));
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,6 +100,20 @@ public class MovieSearch {
             }
         }
 
+    }
+
+    private void searchByName(Connection connection, String movieName) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "select * from movie where \"title\" = ?");
+        preparedStatement.setString(1, movieName);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()) {
+            System.out.printf("id:%d runtime:%d title:%s rating=%s studioID=%s%n", resultSet.getLong("movieID"),
+                        resultSet.getLong("length"), resultSet.getString("title"),
+                        resultSet.getString("MPAA_rating"), resultSet.getString("studioID"));
+        }
     }
 
 }
