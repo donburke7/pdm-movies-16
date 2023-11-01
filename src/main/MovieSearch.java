@@ -36,21 +36,21 @@ public class MovieSearch {
             session.setConfig(config);
             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
             session.connect();
-            System.out.println("Connected");
+//            System.out.println("Connected");
             int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
-            System.out.println("Port Forwarded");
+//            System.out.println("Port Forwarded");
 
             // Assigned port could be different from 5432 but rarely happens
             String url = "jdbc:postgresql://127.0.0.1:"+ assigned_port + "/" + databaseName;
 
-            System.out.println("database Url: " + url);
+//            System.out.println("database Url: " + url);
             java.util.Properties props = new java.util.Properties();
             props.put("user", user);
             props.put("password", password);
 
             Class.forName(driverName);
             conn = DriverManager.getConnection(url, props);
-            System.out.println("Database connection established");
+//            System.out.println("Database connection established");
 
             PreparedStatement statement = conn.prepareStatement("select * from movie where \"movieID\" = 19995");
 
