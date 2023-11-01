@@ -64,10 +64,10 @@ public class MovieSearch {
 
             switch (selection) {
                 case 1:
-                    System.out.println("What is the name of the movie you want to search?");
-                    String movieName = scanner.next();
-                    System.out.println("Searching for "+ movieName);
-                    searchByName(conn, movieName);
+                    searchByName(conn, scanner);
+                    break;
+                case 2:
+                    searchByReleaseDate(conn, scanner);
                     break;
                 default:
                     System.out.println("Invalid input");
@@ -88,18 +88,79 @@ public class MovieSearch {
 
     }
 
-    private void searchByName(Connection connection, String movieName) throws SQLException {
+    private void searchByName(Connection connection, Scanner scanner) throws SQLException {
+
+        System.out.println("What is the name of the movie you want to search?");
+        String movieName = scanner.next();
+        System.out.println("What is your uid");
+        int uid = scanner.nextInt();
+        System.out.println("Searching for "+ movieName + " for " + uid);
+
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "select * from movie where upper(\"title\") like upper(?)");
+                "SELECT m.title,\n" +
+                        "       m.length,\n" +
+                        "       m.\"MPAA_rating\",\n" +
+                        "       CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\",\n" +
+                        "       r.rating\n" +
+                        "FROM movie m\n" +
+                        "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
+                        "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
+                        "JOIN rates r ON r.\"movieid\" = m.\"movieID\"\n" +
+                        "WHERE m.title ILIKE ?\n" +
+                        "AND r.userid = ?");
         preparedStatement.setString(1, "%" + movieName + "%");
+        preparedStatement.setInt(2, uid);
+
+//        System.out.println(preparedStatement);
+
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()) {
+            System.out.printf("runtime:%d title:%s MPAArating=%s director=%s userRating=%d%n", resultSet.getLong("length"),
+                    resultSet.getString("title"), resultSet.getString("MPAA_rating"),
+                    resultSet.getString("director"), resultSet.getLong("rating"));
+        }
+    }
+
+    private void searchByReleaseDate(Connection connection, Scanner scanner) throws SQLException {
+        System.out.println("Do you want to search by month, year, or exact date?");
+        System.out.println("1: Month\n2: Year\n3: Exact Date");
+        int searchOption = scanner.nextInt();
+        PreparedStatement preparedStatement = null;
+        int queryIntVar;
+        switch (searchOption) {
+            case 1:
+                System.out.println("Enter the month as a number (i.e. for October enter 10)");
+                queryIntVar = scanner.nextInt();
+                preparedStatement = connection.prepareStatement(
+                        "select * from movie where \"movieID\" in (select \"movieID\" from releases where " +
+                                "extract(month from \"releaseDate\") = ?)"
+                );
+                preparedStatement.setInt(1, queryIntVar);
+                break;
+            case 2:
+                System.out.println("Enter the year");
+                queryIntVar = scanner.nextInt();
+                preparedStatement = connection.prepareStatement(
+                        "select * from movie where \"movieID\" in (select \"movieID\" from releases where " +
+                                "extract(year from \"releaseDate\") = ?)"
+                );
+                preparedStatement.setInt(1, queryIntVar);
+                break;
+            default:
+                System.out.println("Not a valid option");
+                return;
+        }
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()) {
             System.out.printf("id:%d runtime:%d title:%s rating=%s studioID=%s%n", resultSet.getLong("movieID"),
-                        resultSet.getLong("length"), resultSet.getString("title"),
-                        resultSet.getString("MPAA_rating"), resultSet.getString("studioID"));
+                    resultSet.getLong("length"), resultSet.getString("title"),
+                    resultSet.getString("MPAA_rating"), resultSet.getString("studioID"));
         }
+
     }
 
 }
