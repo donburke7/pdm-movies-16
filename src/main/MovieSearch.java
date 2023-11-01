@@ -73,20 +73,6 @@ public class MovieSearch {
                     System.out.println("Invalid input");
             }
 
-
-
-
-//            PreparedStatement statement = conn.prepareStatement("select * from movie where \"movieID\" = 19995");
-//
-//            ResultSet resultSet = statement.executeQuery();
-
-//            while (resultSet.next()) {
-////                System.out.println(resultSet.getString("title"));
-//                System.out.printf("id:%d runtime:%d title:%s rating=%s%n", resultSet.getLong("movieID"),
-//                        resultSet.getLong("length"), resultSet.getString("title"),
-//                        resultSet.getString("MPAA_rating"));
-//            }
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -104,8 +90,8 @@ public class MovieSearch {
 
     private void searchByName(Connection connection, String movieName) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "select * from movie where \"title\" = ?");
-        preparedStatement.setString(1, movieName);
+                "select * from movie where upper(\"title\") like upper(?)");
+        preparedStatement.setString(1, "%" + movieName + "%");
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
