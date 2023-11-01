@@ -77,11 +77,11 @@ public class MovieSearch {
             e.printStackTrace();
         } finally {
             if (conn != null && !conn.isClosed()) {
-                System.out.println("Closing Database Connection");
+//                System.out.println("Closing Database Connection");
                 conn.close();
             }
             if (session != null && session.isConnected()) {
-                System.out.println("Closing SSH Connection");
+//                System.out.println("Closing SSH Connection");
                 session.disconnect();
             }
         }
@@ -102,7 +102,8 @@ public class MovieSearch {
                         "FROM movie m\n" +
                         "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
                         "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
-                        "WHERE m.title ILIKE ?");
+                        "WHERE m.title ILIKE ?" +
+                        "order by m.\"title\", r.\"releaseDate\"");
         preparedStatement.setString(1, "%" + movieName + "%");
 
         ResultSet resultSet = preparedStatement.executeQuery();
@@ -125,17 +126,36 @@ public class MovieSearch {
                 System.out.println("Enter the month as a number (i.e. for October enter 10)");
                 queryIntVar = scanner.nextInt();
                 preparedStatement = connection.prepareStatement(
-                        "select * from movie where \"movieID\" in (select \"movieID\" from releases where " +
-                                "extract(month from \"releaseDate\") = ?)"
+                        "SELECT  m.title,\n" +
+                                "        m.length,\n" +
+                                "        m.\"MPAA_rating\",\n" +
+                                "        CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\"\n" +
+                                "FROM movie m\n" +
+                                "JOIN releases r ON m.\"movieID\" = r.\"movieID\"\n" +
+                                "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
+                                "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
+                                "where extract(month from \"releaseDate\") = ?" +
+                                "order by m.\"title\", r.\"releaseDate\""
                 );
                 preparedStatement.setInt(1, queryIntVar);
+
+                System.out.println(preparedStatement);
+
                 break;
             case 2:
                 System.out.println("Enter the year");
                 queryIntVar = scanner.nextInt();
                 preparedStatement = connection.prepareStatement(
-                        "select * from movie where \"movieID\" in (select \"movieID\" from releases where " +
-                                "extract(year from \"releaseDate\") = ?)"
+                        "SELECT  m.title,\n" +
+                                "        m.length,\n" +
+                                "        m.\"MPAA_rating\",\n" +
+                                "        CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\"\n" +
+                                "FROM movie m\n" +
+                                "JOIN releases r ON m.\"movieID\" = r.\"movieID\"\n" +
+                                "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
+                                "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
+                                "where extract(year from \"releaseDate\") = ?" +
+                                "order by m.\"title\", r.\"releaseDate\""
                 );
                 preparedStatement.setInt(1, queryIntVar);
                 break;
@@ -147,9 +167,9 @@ public class MovieSearch {
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()) {
-            System.out.printf("id:%d runtime:%d title:%s rating=%s studioID=%s%n", resultSet.getLong("movieID"),
-                    resultSet.getLong("length"), resultSet.getString("title"),
-                    resultSet.getString("MPAA_rating"), resultSet.getString("studioID"));
+            System.out.printf("runtime:%d title:%s MPAArating=%s director=%s%n", resultSet.getLong("length"),
+                    resultSet.getString("title"), resultSet.getString("MPAA_rating"),
+                    resultSet.getString("director"));
         }
 
     }
