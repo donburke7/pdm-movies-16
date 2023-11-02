@@ -13,6 +13,11 @@ public class MovieSearch {
     private Connection connection;
     private int userID;
 
+    public MovieSearch(Connection connection, int userID) {
+        this.connection = connection;
+        this.userID = userID;
+    }
+
     public void movieSearch() throws SQLException {
         int lport = 5432;
         String rhost = "starbug.cs.rit.edu";
@@ -80,6 +85,7 @@ public class MovieSearch {
                     searchByStudioName(conn, scanner);
                     break;
                 case 5:
+                    searchByGenre(conn, scanner);
                     break;
                 default:
                     System.out.println("Invalid input");
