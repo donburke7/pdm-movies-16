@@ -90,14 +90,50 @@ public class collections {
         System.out.println("Here is a list of your collections:\n");
 
     }
-    static void deleteCollection(int userID){
+    static void deleteCollection(Connection conn,int userID) throws SQLException{
         System.out.println("Enter the name of the collection you would like to delete: ");
         String collectionName=scanner.nextLine();
+        PreparedStatement statement = conn.prepareStatement("delete from \"collection\", \"contains\" where collectionName=?");
+        statement.setString(1,collectionName);
+        statement.executeUpdate();
+
         //sql command 
         //Delete From "Collection", "Contains" WHERE collectionName = collectionName
     }
-    static void modifyCollection(){
+    static void modifyCollection(Connection conn) throws SQLException{
+        System.out.println("Enter the name of the collection you would like to change: ");
+        String oldName = scanner.nextLine();
+
+        while(oldName.isEmpty()){
+            System.out.println("The name you input was not valid.\nEnter the name of the collection you would like to change.");
+            oldName=scanner.nextLine();
+        }
+
+        System.out.println("Enter the new collection name: " );
+        String newName = "";
+        String nameInput=scanner.nextLine();
+        if(nameInput.isEmpty()){
+            newName = "collection";
+        }else{{ 
+            newName=nameInput;
+        }}   
         
+        //get the collectionID for the old name: 
+        PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where \"collectionName\"=?");
+        statement.setString(1,oldName);
+        ResultSet resultSet = statement.executeQuery();
+        int collID=0;
+        while (resultSet.next()){
+                collID= resultSet.getInt(1);
+            }
+
+        // System.out.println(collID);
+
+        statement = conn.prepareStatement("update \"collection\" set \"collectionName\"=? where \"collectionID\" = ?");
+        statement.setString(1, newName);
+        statement.setInt(2, collID);
+        statement.executeUpdate();
+
     }
     static void addMovie(){}
     static void deleteMovie(){}
@@ -166,7 +202,13 @@ public class collections {
         }else if (command == 2){
             viewCollections(userID);
         }else if (command == 3){
-            deleteCollection(userID);
+            deleteCollection(conn,userID);
+        }else if (command == 4){
+            addMovie();
+        }else if (command == 5){
+            deleteMovie();
+        }else if (command ==6 ){
+            modifyCollection(conn);
         }
 
         } catch (Exception e){
