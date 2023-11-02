@@ -91,6 +91,18 @@ public class MovieSearch {
 
     }
 
+    private void printResult(ResultSet resultSet) throws SQLException {
+        while (resultSet.next()) {
+            Array actors = resultSet.getArray("actors");
+            String[] actorStrings = (String[])actors.getArray();
+            ArrayList<String> arrayList = new ArrayList<>(List.of(actorStrings));
+            System.out.printf("runtime:%d title:%s MPAArating=%s director=%s actors:%s avgrating:%d%n", resultSet.getLong("length"),
+                    resultSet.getString("title"), resultSet.getString("MPAA_rating"),
+                    resultSet.getArray("director").toString(), arrayList.subList(0,Math.min(5, arrayList.size() - 1)),
+                    resultSet.getLong("rating"));
+        }
+    }
+
     private void searchByName(Connection connection, Scanner scanner) throws SQLException {
 
         System.out.println("What is the name of the movie you want to search?");
@@ -118,15 +130,7 @@ public class MovieSearch {
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
-        while (resultSet.next()) {
-            Array actors = resultSet.getArray("actors");
-            String[] actorStrings = (String[])actors.getArray();
-            ArrayList<String> arrayList = new ArrayList<>(List.of(actorStrings));
-            System.out.printf("runtime:%d title:%s MPAArating=%s director=%s actors:%s avgrating:%d%n", resultSet.getLong("length"),
-                    resultSet.getString("title"), resultSet.getString("MPAA_rating"),
-                    resultSet.getArray("director").toString(), arrayList.subList(0,5).toString(),
-                    resultSet.getLong("rating"));
-        }
+        printResult(resultSet);
     }
 
     private void searchByReleaseDate(Connection connection, Scanner scanner) throws SQLException {
@@ -144,16 +148,20 @@ public class MovieSearch {
                                 SELECT  m.title,
                                         m.length,
                                         m."MPAA_rating",
-                                        CONCAT(c."fName", ' ', c."lName") AS "Director"
+                                        array_agg(distinct concat(dc."fName", ' ', dc."lName")) as director,
+                                        array_agg(distinct concat(ac."fName", ' ', ac."lName")) as actors,
+                                        round(avg(ur.rating), 2) as rating
                                 FROM movie m
                                 JOIN releases r ON m."movieID" = r."movieID"
                                 JOIN directs d ON m."movieID" = d."movieID"
-                                JOIN contributors c ON d."contributorID" = c."contributorID"
-                                where extract(month from "releaseDate") = ?order by m."title", r."releaseDate\""""
+                                JOIN acts_in a on m."movieID" = a."movieID"
+                                join contributors ac on a."contributorID" = ac."contributorID"
+                                JOIN contributors dc ON d."contributorID" = dc."contributorID"
+                                join rates ur on m."movieID" = ur.movieid
+                                WHERE extract(month from "releaseDate") = ? group by m."movieID" order by array_agg(distinct m."title"), array_agg(distinct r."releaseDate")
+                                """
                 );
                 preparedStatement.setInt(1, queryIntVar);
-
-                System.out.println(preparedStatement);
 
                 break;
             case 2:
@@ -164,12 +172,18 @@ public class MovieSearch {
                                 SELECT  m.title,
                                         m.length,
                                         m."MPAA_rating",
-                                        CONCAT(c."fName", ' ', c."lName") AS "Director"
+                                        array_agg(distinct concat(dc."fName", ' ', dc."lName")) as director,
+                                        array_agg(distinct concat(ac."fName", ' ', ac."lName")) as actors,
+                                        round(avg(ur.rating), 2) as rating
                                 FROM movie m
                                 JOIN releases r ON m."movieID" = r."movieID"
                                 JOIN directs d ON m."movieID" = d."movieID"
-                                JOIN contributors c ON d."contributorID" = c."contributorID"
-                                where extract(year from "releaseDate") = ?order by m."title", r."releaseDate\""""
+                                JOIN acts_in a on m."movieID" = a."movieID"
+                                join contributors ac on a."contributorID" = ac."contributorID"
+                                JOIN contributors dc ON d."contributorID" = dc."contributorID"
+                                join rates ur on m."movieID" = ur.movieid
+                                WHERE extract(year from "releaseDate") = ? group by m."movieID" order by array_agg(distinct m."title"), array_agg(distinct r."releaseDate")
+                                """
                 );
                 preparedStatement.setInt(1, queryIntVar);
                 break;
@@ -186,12 +200,18 @@ public class MovieSearch {
                                 SELECT  m.title,
                                         m.length,
                                         m."MPAA_rating",
-                                        CONCAT(c."fName", ' ', c."lName") AS "Director"
+                                        array_agg(distinct concat(dc."fName", ' ', dc."lName")) as director,
+                                        array_agg(distinct concat(ac."fName", ' ', ac."lName")) as actors,
+                                        round(avg(ur.rating), 2) as rating
                                 FROM movie m
                                 JOIN releases r ON m."movieID" = r."movieID"
                                 JOIN directs d ON m."movieID" = d."movieID"
-                                JOIN contributors c ON d."contributorID" = c."contributorID"
-                                where "releaseDate" = ? order by m."title", r."releaseDate\""""
+                                JOIN acts_in a on m."movieID" = a."movieID"
+                                join contributors ac on a."contributorID" = ac."contributorID"
+                                JOIN contributors dc ON d."contributorID" = dc."contributorID"
+                                join rates ur on m."movieID" = ur.movieid
+                                WHERE "releaseDate" = ? group by m."movieID" order by array_agg(distinct m."title"), array_agg(distinct r."releaseDate")
+                                """
                 );
                 preparedStatement.setDate(1, Date.valueOf(year + "-" + month + "-" + day));
                 break;
@@ -202,11 +222,7 @@ public class MovieSearch {
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
-        while (resultSet.next()) {
-            System.out.printf("runtime:%d title:%s MPAArating=%s director=%s%n", resultSet.getLong("length"),
-                    resultSet.getString("title"), resultSet.getString("MPAA_rating"),
-                    resultSet.getString("director"));
-        }
+        printResult(resultSet);
 
     }
 
