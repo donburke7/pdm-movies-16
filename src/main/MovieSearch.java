@@ -12,7 +12,7 @@ public class MovieSearch {
     public void movieSearch() throws SQLException {
         int lport = 5432;
         String rhost = "starbug.cs.rit.edu";
-        int rport =5432;
+        int rport = 5432;
         String user;
         String password;
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("dataSources/credentials.txt"))) {
@@ -95,16 +95,16 @@ public class MovieSearch {
         System.out.println("Searching for "+ movieName);
 
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT m.title,\n" +
-                        "       m.length,\n" +
-                        "       m.\"MPAA_rating\",\n" +
-                        "       CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\"\n" +
-                        "FROM movie m\n" +
-                        "JOIN releases r ON m.\"movieID\" = r.\"movieID\"\n" +
-                        "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
-                        "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
-                        "WHERE m.title ILIKE ?" +
-                        "order by m.\"title\", r.\"releaseDate\"");
+                """
+                        SELECT m.title,
+                               m.length,
+                               m."MPAA_rating",
+                               CONCAT(c."fName", ' ', c."lName") AS "Director"
+                        FROM movie m
+                        JOIN releases r ON m."movieID" = r."movieID"
+                        JOIN directs d ON m."movieID" = d."movieID"
+                        JOIN contributors c ON d."contributorID" = c."contributorID"
+                        WHERE m.title ILIKE ?order by m."title", r."releaseDate\"""");
         preparedStatement.setString(1, "%" + movieName + "%");
 
         ResultSet resultSet = preparedStatement.executeQuery();
@@ -127,16 +127,16 @@ public class MovieSearch {
                 System.out.println("Enter the month as a number (i.e. for October enter 10)");
                 queryIntVar = scanner.nextInt();
                 preparedStatement = connection.prepareStatement(
-                        "SELECT  m.title,\n" +
-                                "        m.length,\n" +
-                                "        m.\"MPAA_rating\",\n" +
-                                "        CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\"\n" +
-                                "FROM movie m\n" +
-                                "JOIN releases r ON m.\"movieID\" = r.\"movieID\"\n" +
-                                "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
-                                "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
-                                "where extract(month from \"releaseDate\") = ?" +
-                                "order by m.\"title\", r.\"releaseDate\""
+                        """
+                                SELECT  m.title,
+                                        m.length,
+                                        m."MPAA_rating",
+                                        CONCAT(c."fName", ' ', c."lName") AS "Director"
+                                FROM movie m
+                                JOIN releases r ON m."movieID" = r."movieID"
+                                JOIN directs d ON m."movieID" = d."movieID"
+                                JOIN contributors c ON d."contributorID" = c."contributorID"
+                                where extract(month from "releaseDate") = ?order by m."title", r."releaseDate\""""
                 );
                 preparedStatement.setInt(1, queryIntVar);
 
@@ -147,16 +147,16 @@ public class MovieSearch {
                 System.out.println("Enter the year");
                 queryIntVar = scanner.nextInt();
                 preparedStatement = connection.prepareStatement(
-                        "SELECT  m.title,\n" +
-                                "        m.length,\n" +
-                                "        m.\"MPAA_rating\",\n" +
-                                "        CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\"\n" +
-                                "FROM movie m\n" +
-                                "JOIN releases r ON m.\"movieID\" = r.\"movieID\"\n" +
-                                "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
-                                "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
-                                "where extract(year from \"releaseDate\") = ?" +
-                                "order by m.\"title\", r.\"releaseDate\""
+                        """
+                                SELECT  m.title,
+                                        m.length,
+                                        m."MPAA_rating",
+                                        CONCAT(c."fName", ' ', c."lName") AS "Director"
+                                FROM movie m
+                                JOIN releases r ON m."movieID" = r."movieID"
+                                JOIN directs d ON m."movieID" = d."movieID"
+                                JOIN contributors c ON d."contributorID" = c."contributorID"
+                                where extract(year from "releaseDate") = ?order by m."title", r."releaseDate\""""
                 );
                 preparedStatement.setInt(1, queryIntVar);
                 break;
@@ -169,15 +169,16 @@ public class MovieSearch {
                 int day = scanner.nextInt();
 
                 preparedStatement = connection.prepareStatement(
-                        "SELECT  m.title,\n" +
-                                "        m.length,\n" +
-                                "        m.\"MPAA_rating\",\n" +
-                                "        CONCAT(c.\"fName\", ' ', c.\"lName\") AS \"Director\"\n" +
-                                "FROM movie m\n" +
-                                "JOIN releases r ON m.\"movieID\" = r.\"movieID\"\n" +
-                                "JOIN directs d ON m.\"movieID\" = d.\"movieID\"\n" +
-                                "JOIN contributors c ON d.\"contributorID\" = c.\"contributorID\"\n" +
-                                "where \"releaseDate\" = ? order by m.\"title\", r.\"releaseDate\""
+                        """
+                                SELECT  m.title,
+                                        m.length,
+                                        m."MPAA_rating",
+                                        CONCAT(c."fName", ' ', c."lName") AS "Director"
+                                FROM movie m
+                                JOIN releases r ON m."movieID" = r."movieID"
+                                JOIN directs d ON m."movieID" = d."movieID"
+                                JOIN contributors c ON d."contributorID" = c."contributorID"
+                                where "releaseDate" = ? order by m."title", r."releaseDate\""""
                 );
                 preparedStatement.setDate(1, Date.valueOf(year + "-" + month + "-" + day));
                 break;
@@ -194,6 +195,17 @@ public class MovieSearch {
                     resultSet.getString("director"));
         }
 
+    }
+
+    private void searchByCastMember(Connection connection, Scanner scanner) {
+        System.out.println("Enter cast member name:");
+        String castMemberName = scanner.next();
+
+//        PreparedStatement preparedStatement = connection.prepareStatement(
+//                """
+//
+//                    """
+//        );
     }
 
 }
