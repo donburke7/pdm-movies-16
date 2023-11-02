@@ -5,6 +5,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class MovieSearch {
@@ -96,23 +99,33 @@ public class MovieSearch {
 
         PreparedStatement preparedStatement = connection.prepareStatement(
                 """
-                        SELECT m.title,
-                               m.length,
-                               m."MPAA_rating",
-                               CONCAT(c."fName", ' ', c."lName") AS "Director"
+                        SELECT  m.title,
+                                m.length,
+                                m."MPAA_rating",
+                                array_agg(distinct concat(dc."fName", ' ', dc."lName")) as director,
+                                array_agg(distinct concat(ac."fName", ' ', ac."lName")) as actors,
+                                round(avg(ur.rating), 2) as rating
                         FROM movie m
                         JOIN releases r ON m."movieID" = r."movieID"
                         JOIN directs d ON m."movieID" = d."movieID"
-                        JOIN contributors c ON d."contributorID" = c."contributorID"
-                        WHERE m.title ILIKE ?order by m."title", r."releaseDate\"""");
+                        JOIN acts_in a on m."movieID" = a."movieID"
+                        join contributors ac on a."contributorID" = ac."contributorID"
+                        JOIN contributors dc ON d."contributorID" = dc."contributorID"
+                        join rates ur on m."movieID" = ur.movieid
+                        WHERE m.title ILIKE ? group by m."movieID" order by array_agg(distinct m."title"), array_agg(distinct r."releaseDate")
+                        """);
         preparedStatement.setString(1, "%" + movieName + "%");
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()) {
-            System.out.printf("runtime:%d title:%s MPAArating=%s director=%s%n", resultSet.getLong("length"),
+            Array actors = resultSet.getArray("actors");
+            String[] actorStrings = (String[])actors.getArray();
+            ArrayList<String> arrayList = new ArrayList<>(List.of(actorStrings));
+            System.out.printf("runtime:%d title:%s MPAArating=%s director=%s actors:%s avgrating:%d%n", resultSet.getLong("length"),
                     resultSet.getString("title"), resultSet.getString("MPAA_rating"),
-                    resultSet.getString("director"));
+                    resultSet.getArray("director").toString(), arrayList.subList(0,5).toString(),
+                    resultSet.getLong("rating"));
         }
     }
 
