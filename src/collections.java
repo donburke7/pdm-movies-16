@@ -52,7 +52,7 @@ public class collections {
             
             //check name for null
             if( nameInput.isEmpty()){
-                collectionName="collection";
+                collectionName="Collection";
             }else{
                 collectionName=nameInput;
             }
@@ -90,11 +90,14 @@ public class collections {
         System.out.println("Here is a list of your collections:\n");
 
     }
+
+
+
     static void deleteCollection(Connection conn,int userID) throws SQLException{
         System.out.println("Enter the name of the collection you would like to delete: ");
         String collectionName=scanner.nextLine();
-        int collectionID=-1;
-        PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where \"collectionName\" =? AND \"userID\"=?");
+        int collectionID=0;
+        PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where \"collectionName\" =? and \"userID\"=?");
         statement.setString(1,collectionName);
         statement.setInt(2, userID);
         ResultSet resultSet = statement.executeQuery();
@@ -102,13 +105,19 @@ public class collections {
             collectionID=resultSet.getInt(1);
         }
 
-        statement = conn.prepareStatement("delete from \"collection\" where \"collectionID\"=?");
+        System.out.println(collectionID);
+        statement = conn.prepareStatement("delete from \"collection\" where \"collectionID\"=? ");
         statement.setInt(1, collectionID);
         statement.executeUpdate();
 
         //sql command 
         //Delete From "Collection", "Contains" WHERE collectionName = collectionName
     }
+
+
+
+
+
     static void modifyCollection(Connection conn) throws SQLException{
         System.out.println("Enter the name of the collection you would like to change: ");
         String oldName = scanner.nextLine();
@@ -146,6 +155,14 @@ public class collections {
         //statement = conn.prepareStatement("update \"contains")
 
     }
+
+
+
+
+
+
+
+
     static void addMovie(Connection conn) throws SQLException{
         //enter the name of the collection you would like to add to 
         System.out.println("Enter the name of the collection you want to add a movie to: ");
@@ -199,7 +216,27 @@ public class collections {
         // statement.executeUpdate();
         
     }
+
+
+
+
+
+
+
+
+
+
+
     static void deleteMovie(){}
+
+
+
+
+
+
+
+
+
 
 
     public static void main(String[] args) throws SQLException{
