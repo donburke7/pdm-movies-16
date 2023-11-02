@@ -10,6 +10,7 @@ import java.util.*;
 
 public class MovieSearch {
 
+    private static final int MAX_ACTOR_LIST_SIZE = 5;
     private Connection connection;
     private int userID;
 
@@ -19,49 +20,6 @@ public class MovieSearch {
     }
 
     public void movieSearch() throws SQLException {
-//        int lport = 5432;
-//        String rhost = "starbug.cs.rit.edu";
-//        int rport = 5432;
-//        String user;
-//        String password;
-//        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("dataSources/credentials.txt"))) {
-//            user = bufferedReader.readLine();
-//            password = bufferedReader.readLine();
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        String databaseName = "p320_16";
-//
-//        String driverName = "org.postgresql.Driver";
-//
-//        Connection connection = null;
-//        Session session = null;
-//
-//        try {
-//            java.util.Properties config = new java.util.Properties();
-//            config.put("StrictHostKeyChecking", "no");
-//            JSch jsch = new JSch();
-//            session = jsch.getSession(user, rhost, 22);
-//            session.setPassword(password);
-//            session.setConfig(config);
-//            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-//            session.connect();
-////            System.out.println("Connected");
-//            int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
-////            System.out.println("Port Forwarded");
-//
-//            // Assigned port could be different from 5432 but rarely happens
-//            String url = "jdbc:postgresql://127.0.0.1:"+ assigned_port + "/" + databaseName;
-//
-////            System.out.println("database Url: " + url);
-//            java.util.Properties props = new java.util.Properties();
-//            props.put("user", user);
-//            props.put("password", password);
-//
-//            Class.forName(driverName);
-//            connection = DriverManager.getConnection(url, props);
-////            System.out.println("Database connection established");
-
         int selection = 0;
 
         while (selection != 9) {
@@ -98,32 +56,23 @@ public class MovieSearch {
                     System.out.println("Invalid input");
             }
         }
-
-
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (connection != null && !connection.isClosed()) {
-////                System.out.println("Closing Database Connection");
-//                connection.close();
-//            }
-//            if (session != null && session.isConnected()) {
-////                System.out.println("Closing SSH Connection");
-//                session.disconnect();
-//            }
-//        }
-
     }
 
     private void printResult(ResultSet resultSet) throws SQLException {
         while (resultSet.next()) {
             Array actors = resultSet.getArray("actors");
             String[] actorStrings = (String[])actors.getArray();
-            ArrayList<String> arrayList = new ArrayList<>(List.of(actorStrings));
-            System.out.printf("runtime:%d title:%s MPAArating=%s director=%s actors:%s avgrating:%d%n", resultSet.getLong("length"),
-                    resultSet.getString("title"), resultSet.getString("MPAA_rating"),
-                    resultSet.getArray("director").toString(), arrayList.subList(0,Math.min(5, arrayList.size() - 1)),
-                    resultSet.getLong("rating"));
+            ArrayList<String> actorArrayList = new ArrayList<>(List.of(actorStrings));
+            String[] directorString = (String[])resultSet.getArray("director").getArray();
+            ArrayList<String> directorArrayList = new ArrayList<>(List.of(directorString));
+            if (directorArrayList.isEmpty()) {
+                directorArrayList.add("Not Found");
+            }
+            System.out.printf("Movie Name: \"%s\" | Runtime: %d | Director: %s | MPAA Rating: %s | " +
+                    "Average User Rating :%d | Actor List: %s%n", resultSet.getString("title"),
+                    resultSet.getInt("length"), directorArrayList.get(0),
+                    resultSet.getString("MPAA_rating"), resultSet.getLong("rating"),
+                    actorArrayList.subList(0, Math.min(MAX_ACTOR_LIST_SIZE, actorArrayList.size())));
         }
     }
 
