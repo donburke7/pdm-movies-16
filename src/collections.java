@@ -117,6 +117,10 @@ public class collections {
         statement.executeUpdate();
 
         //delete from contains 
+        statement = conn.prepareStatement("delete from \"contains\" where \"collectionID\" =?");
+        statement.setInt(1, collectionID);
+        statement.executeUpdate();
+
         //sql command 
         //Delete From "Collection", "Contains" WHERE collectionName = collectionName
     }
@@ -296,7 +300,7 @@ public class collections {
             Class.forName(driverName);
             conn = DriverManager.getConnection(url, props);
 
-             int userID = 2;
+             int userID = 894;
         if (command == 0){
             command=printMenu();
         }else if (command == 1){
