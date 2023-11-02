@@ -5,12 +5,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.sql.Date;
+import java.util.*;
 
 public class MovieSearch {
+
+    private Connection connection;
+    private int userID;
 
     public void movieSearch() throws SQLException {
         int lport = 5432;
@@ -71,6 +72,14 @@ public class MovieSearch {
                     break;
                 case 2:
                     searchByReleaseDate(conn, scanner);
+                    break;
+                case 3:
+                    searchByCastMember(conn, scanner);
+                    break;
+                case 4:
+                    searchByStudioName(conn, scanner);
+                    break;
+                case 5:
                     break;
                 default:
                     System.out.println("Invalid input");
@@ -224,17 +233,111 @@ public class MovieSearch {
 
         printResult(resultSet);
 
+        System.out.println(preparedStatement);
+
     }
 
-    private void searchByCastMember(Connection connection, Scanner scanner) {
-        System.out.println("Enter cast member name:");
-        String castMemberName = scanner.next();
+    private void searchByCastMember(Connection connection, Scanner scanner) throws SQLException {
+        System.out.println("Enter cast member first name(enter if unknown):");
+        String castMemberFirstName = scanner.next();
+        System.out.println("Enter cast member last name(enter if unknown):");
+        String castMemberLastName = scanner.next();
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                """
+                    SELECT  m.title,
+                            m.length,
+                            m."MPAA_rating",
+                            array_agg(distinct concat(dc."fName", ' ', dc."lName")) as director,
+                            array_agg(distinct concat(ac."fName", ' ', ac."lName")) as actors,
+                            round(avg(ur.rating), 2) as rating
+                    FROM movie m
+                    JOIN releases r ON m."movieID" = r."movieID"
+                    JOIN directs d ON m."movieID" = d."movieID"
+                    JOIN acts_in a on m."movieID" = a."movieID"
+                    join contributors ac on a."contributorID" = ac."contributorID"
+                    JOIN contributors dc ON d."contributorID" = dc."contributorID"
+                    join rates ur on m."movieID" = ur.movieid
+                    WHERE concat(ac."fName", ac."lName") ILIKE ?
+                    group by m."movieID"\s
+                    order by array_agg(distinct m."title"), array_agg(distinct r."releaseDate")
+                    """
+        );
 
-//        PreparedStatement preparedStatement = connection.prepareStatement(
-//                """
-//
-//                    """
-//        );
+        preparedStatement.setString(1, "%" + castMemberFirstName + "%" + castMemberLastName + "%");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        printResult(resultSet);
+    }
+
+    private void searchByStudioName(Connection connection, Scanner scanner) throws SQLException {
+        System.out.println("Enter studio name:");
+        String studioName = scanner.next();
+
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                """
+                    SELECT  m.title,
+                            m.length,
+                            m."MPAA_rating",
+                            array_agg(distinct concat(dc."fName", ' ', dc."lName")) as director,
+                            array_agg(distinct concat(ac."fName", ' ', ac."lName")) as actors,
+                            round(avg(ur.rating), 2) as rating
+                    FROM movie m
+                    JOIN releases r ON m."movieID" = r."movieID"
+                    JOIN directs d ON m."movieID" = d."movieID"
+                    JOIN acts_in a on m."movieID" = a."movieID"
+                    JOIN contributors ac ON a."contributorID" = ac."contributorID"
+                    JOIN contributors dc ON d."contributorID" = dc."contributorID"
+                    JOIN rates ur ON m."movieID" = ur.movieid
+                    JOIN studio s ON m.studioid = s."studioID"
+                    WHERE s.name ILIKE ?
+                    group by m."movieID"
+                    order by array_agg(distinct m."title"), array_agg(distinct r."releaseDate")
+                    """
+        );
+
+        preparedStatement.setString(1, "%" + studioName + "%");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        printResult(resultSet);
+    }
+
+    private void searchByGenre(Connection connection, Scanner scanner) throws SQLException {
+        ResultSet resultSet = connection.prepareStatement("select type from genre").executeQuery();
+        System.out.println("Select genre to search by using its number");
+
+        HashMap<Integer, String> genreHashMap = new HashMap<>();
+        int counter = 0;
+        while (resultSet.next()) {
+            genreHashMap.put(counter, resultSet.getString("type"));
+            System.out.printf("%d: %s%n", counter, genreHashMap.get(counter));
+            counter++;
+        }
+
+        int genreNumber = scanner.nextInt();
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                """
+                    SELECT  m.title,
+                            m.length,
+                            m."MPAA_rating",
+                            array_agg(distinct concat(dc."fName", ' ', dc."lName")) as director,
+                            array_agg(distinct concat(ac."fName", ' ', ac."lName")) as actors,
+                            round(avg(ur.rating), 2) as rating
+                    FROM movie m
+                    JOIN releases r ON m."movieID" = r."movieID"
+                    JOIN directs d ON m."movieID" = d."movieID"
+                    JOIN acts_in a on m."movieID" = a."movieID"
+                    JOIN contributors ac ON a."contributorID" = ac."contributorID"
+                    JOIN contributors dc ON d."contributorID" = dc."contributorID"
+                    JOIN rates ur ON m."movieID" = ur.movieid
+                    JOIN classified_by c ON m."movieID" = c.movieid
+                    JOIN genre g ON c.genreid = g.genreid
+                    WHERE g.type ILIKE ?
+                    group by m."movieID"
+                    order by array_agg(distinct m."title"), array_agg(distinct r."releaseDate")
+                    """
+        );
+
+        preparedStatement.setString(1, genreHashMap.get(genreNumber));
+        ResultSet resultSet1 = preparedStatement.executeQuery();
+        printResult(resultSet1);
     }
 
 }
