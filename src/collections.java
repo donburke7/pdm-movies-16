@@ -93,7 +93,7 @@ public class collections {
 
 
     /**
-     * Delete Collection - Deletes a whole collection 
+     * Delete Collection - Deletes a whole collection from collections and contains 
      * @param conn - the connection 
      * @param userID- the user ID (got after logged in )
      * @throws SQLException
@@ -129,7 +129,7 @@ public class collections {
 
 
 
-    static void modifyCollection(Connection conn) throws SQLException{
+    static void modifyCollection(Connection conn, int userID) throws SQLException{
         System.out.println("Enter the name of the collection you would like to change: ");
         String oldName = scanner.nextLine();
 
@@ -148,8 +148,9 @@ public class collections {
         }}   
         
         //get the collectionID for the old name: 
-        PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where \"collectionName\"=?");
+        PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where \"collectionName\"=? and \"userID\"=?");
         statement.setString(1,oldName);
+        statement.setInt(2, userID);
         ResultSet resultSet = statement.executeQuery();
         int collID=0;
         while (resultSet.next()){
@@ -300,7 +301,7 @@ public class collections {
             Class.forName(driverName);
             conn = DriverManager.getConnection(url, props);
 
-             int userID = 894;
+             int userID = 31;
         if (command == 0){
             command=printMenu();
         }else if (command == 1){
@@ -319,7 +320,7 @@ public class collections {
         }else if (command == 5){
             deleteMovie();
         }else if (command ==6 ){
-            modifyCollection(conn);
+            modifyCollection(conn,userID);
         }
 
         } catch (Exception e){
