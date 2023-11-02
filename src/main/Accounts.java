@@ -1,4 +1,4 @@
-package java;
+
 import java.util.Scanner;
 import java.io.*;
 import java.sql.*;
@@ -9,13 +9,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import javax.swing.text.Utilities;
-
 
 /// This class handles all account issues as well as passing off functionality to other 
 /// classes
 public class Accounts {
-    //The scanner used for reading user input
+
+    ///The scanner used for reading user input
     public static Scanner sc = new Scanner(System.in);
 
     // the static userID of the current user logged in
@@ -28,8 +27,56 @@ public class Accounts {
     static Statement stmt;
 
     static Connection conn;
+    static Session session;
     // checks if a user is logged in or not
     public static boolean loginChecker;
+
+    public Accounts() throws Exception{
+
+        int lport = 5432;
+        String rhost = "starbug.cs.rit.edu";
+        int rport = 5432;
+        String user;
+        String password;
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("dataSources/credentials.txt"))) {
+            user = bufferedReader.readLine();
+            password = bufferedReader.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String databaseName = "p320_16"; //change to your database name
+
+        String driverName = "org.postgresql.Driver";
+        
+        java.util.Properties config = new java.util.Properties();
+        config.put("StrictHostKeyChecking", "no");
+        JSch jsch = new JSch();
+        session = jsch.getSession(user, rhost, 22);
+        session.setPassword(password);
+        session.setConfig(config);
+        session.setConfig("PreferredAuthentications","publickey,keyboard-interactive,password");
+        session.connect();
+        System.out.println("Connected");
+        int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
+        System.out.println("Port Forwarded");
+
+        // Assigned port could be different from 5432 but rarely happens
+        String url = "jdbc:postgresql://127.0.0.1:"+ assigned_port + "/" + databaseName;
+
+        System.out.println("database Url: " + url);
+        Properties props = new Properties();
+        props.put("user", user);
+        props.put("password", password);
+
+        Class.forName(driverName);
+        conn = DriverManager.getConnection(url, props);
+        System.out.println("Database connection established");
+
+        stmt = conn.createStatement();
+
+
+    }
     
     /**
      * Constructor to put userID to be used for creating account in
@@ -41,18 +88,21 @@ public class Accounts {
             throw new RuntimeException(e);
         }
     }
+    public Session gSession(){
+        return session;
+    }
     /**
      * This gets the current logged in user's userID 
      * @return the int userID
      */
-    public static int getUserID(){
+    public int getUserID(){
         return userID;
     }
     /**
      * Gets connection for everyone else to use
      * @return the connection created
      */
-    public static Connection getConnection(){
+    public Connection getConnection(){
         return conn;
     }
 
@@ -211,7 +261,7 @@ public class Accounts {
      * This method is used to create a new account and prompts user for everything but userID which is generated
      */
     public static void createAccount() throws SQLException{
-        // incrementCounterUserID();
+        setCounterID();
         System.out.println("Welcome to Account Creation. Please enter credentials below: \n");
         System.out.println("Please enter first name:");
         String firstName = sc.nextLine();
@@ -255,75 +305,5 @@ public class Accounts {
 
         
     }
-    /**
-     * Temp main - to be removed.
-     * @param args
-     * @throws SQLException
-     */
-    public static void main(String[] args) throws SQLException {
 
-        int lport = 5432;
-        String rhost = "starbug.cs.rit.edu";
-        int rport = 5432;
-        String user;
-        String password;
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("dataSources/credentials.txt"))) {
-            user = bufferedReader.readLine();
-            password = bufferedReader.readLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-      
-
-        String databaseName = "p320_16"; //change to your database name
-
-        String driverName = "org.postgresql.Driver";
-        //Connection conn = null;
-        Session session = null;
-        try {
-            java.util.Properties config = new java.util.Properties();
-            config.put("StrictHostKeyChecking", "no");
-            JSch jsch = new JSch();
-            session = jsch.getSession(user, rhost, 22);
-            session.setPassword(password);
-            session.setConfig(config);
-            session.setConfig("PreferredAuthentications","publickey,keyboard-interactive,password");
-            session.connect();
-            System.out.println("Connected");
-            int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
-            System.out.println("Port Forwarded");
-
-            // Assigned port could be different from 5432 but rarely happens
-            String url = "jdbc:postgresql://127.0.0.1:"+ assigned_port + "/" + databaseName;
-
-            System.out.println("database Url: " + url);
-            Properties props = new Properties();
-            props.put("user", user);
-            props.put("password", password);
-
-            Class.forName(driverName);
-            conn = DriverManager.getConnection(url, props);
-            System.out.println("Database connection established");
-
-            stmt = conn.createStatement();
-            setCounterID();
-            printBeginMenu();
-
-            sc.close();
-
-            // Do something with the database....
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (conn != null && !conn.isClosed()) {
-                System.out.println("Closing Database Connection");
-                conn.close();
-            }
-            if (session != null && session.isConnected()) {
-                System.out.println("Closing SSH Connection");
-                session.disconnect();
-            }
-        }
-    }
 }
