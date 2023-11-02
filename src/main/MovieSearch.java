@@ -19,49 +19,52 @@ public class MovieSearch {
     }
 
     public void movieSearch() throws SQLException {
-        int lport = 5432;
-        String rhost = "starbug.cs.rit.edu";
-        int rport = 5432;
-        String user;
-        String password;
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("dataSources/credentials.txt"))) {
-            user = bufferedReader.readLine();
-            password = bufferedReader.readLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        String databaseName = "p320_16";
+//        int lport = 5432;
+//        String rhost = "starbug.cs.rit.edu";
+//        int rport = 5432;
+//        String user;
+//        String password;
+//        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("dataSources/credentials.txt"))) {
+//            user = bufferedReader.readLine();
+//            password = bufferedReader.readLine();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        String databaseName = "p320_16";
+//
+//        String driverName = "org.postgresql.Driver";
+//
+//        Connection connection = null;
+//        Session session = null;
+//
+//        try {
+//            java.util.Properties config = new java.util.Properties();
+//            config.put("StrictHostKeyChecking", "no");
+//            JSch jsch = new JSch();
+//            session = jsch.getSession(user, rhost, 22);
+//            session.setPassword(password);
+//            session.setConfig(config);
+//            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+//            session.connect();
+////            System.out.println("Connected");
+//            int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
+////            System.out.println("Port Forwarded");
+//
+//            // Assigned port could be different from 5432 but rarely happens
+//            String url = "jdbc:postgresql://127.0.0.1:"+ assigned_port + "/" + databaseName;
+//
+////            System.out.println("database Url: " + url);
+//            java.util.Properties props = new java.util.Properties();
+//            props.put("user", user);
+//            props.put("password", password);
+//
+//            Class.forName(driverName);
+//            connection = DriverManager.getConnection(url, props);
+////            System.out.println("Database connection established");
 
-        String driverName = "org.postgresql.Driver";
+        int selection = 0;
 
-        Connection conn = null;
-        Session session = null;
-
-        try {
-            java.util.Properties config = new java.util.Properties();
-            config.put("StrictHostKeyChecking", "no");
-            JSch jsch = new JSch();
-            session = jsch.getSession(user, rhost, 22);
-            session.setPassword(password);
-            session.setConfig(config);
-            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-            session.connect();
-//            System.out.println("Connected");
-            int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
-//            System.out.println("Port Forwarded");
-
-            // Assigned port could be different from 5432 but rarely happens
-            String url = "jdbc:postgresql://127.0.0.1:"+ assigned_port + "/" + databaseName;
-
-//            System.out.println("database Url: " + url);
-            java.util.Properties props = new java.util.Properties();
-            props.put("user", user);
-            props.put("password", password);
-
-            Class.forName(driverName);
-            conn = DriverManager.getConnection(url, props);
-//            System.out.println("Database connection established");
-
+        while (selection != 9) {
             Scanner scanner = new Scanner(System.in);
             System.out.println("What would you like to search by?");
             System.out.println("1: Movie Name");
@@ -69,40 +72,46 @@ public class MovieSearch {
             System.out.println("3: Cast Member Name");
             System.out.println("4: Studio Name");
             System.out.println("5: Genre");
-            int selection = scanner.nextInt();
+            System.out.println("9: To go back to main menu");
+            selection = scanner.nextInt();
 
             switch (selection) {
                 case 1:
-                    searchByName(conn, scanner);
+                    searchByName(connection, scanner);
                     break;
                 case 2:
-                    searchByReleaseDate(conn, scanner);
+                    searchByReleaseDate(connection, scanner);
                     break;
                 case 3:
-                    searchByCastMember(conn, scanner);
+                    searchByCastMember(connection, scanner);
                     break;
                 case 4:
-                    searchByStudioName(conn, scanner);
+                    searchByStudioName(connection, scanner);
                     break;
                 case 5:
-                    searchByGenre(conn, scanner);
+                    searchByGenre(connection, scanner);
+                    break;
+                case 9:
+                    System.out.println("Going back to main menu now");
                     break;
                 default:
                     System.out.println("Invalid input");
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (conn != null && !conn.isClosed()) {
-//                System.out.println("Closing Database Connection");
-                conn.close();
-            }
-            if (session != null && session.isConnected()) {
-//                System.out.println("Closing SSH Connection");
-                session.disconnect();
-            }
         }
+
+
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (connection != null && !connection.isClosed()) {
+////                System.out.println("Closing Database Connection");
+//                connection.close();
+//            }
+//            if (session != null && session.isConnected()) {
+////                System.out.println("Closing SSH Connection");
+//                session.disconnect();
+//            }
+//        }
 
     }
 
@@ -236,10 +245,7 @@ public class MovieSearch {
         }
 
         ResultSet resultSet = preparedStatement.executeQuery();
-
         printResult(resultSet);
-
-        System.out.println(preparedStatement);
 
     }
 
