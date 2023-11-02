@@ -134,8 +134,42 @@ public class collections {
         statement.setInt(2, collID);
         statement.executeUpdate();
 
+        //statement = conn.prepareStatement("update \"contains")
+
     }
-    static void addMovie(){}
+    static void addMovie(Connection conn) throws SQLException{
+        //enter the name of the collection you would like to add to 
+        System.out.println("Enter the name of the collection you want to add a movie to: ");
+        String collectionName = scanner.nextLine();
+
+        while(collectionName.isEmpty()){
+            System.out.println("The name you input was not valid.\nEnter the name of the collection you would like to change.");
+            collectionName=scanner.nextLine();
+        }
+
+        //get the id of that collection if that names exist 
+        int collectionID=0;
+        PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where exists (select \"collectionName\" from \"collection\" where \"collectionName\" =?)");
+        statement.setString(1, collectionName);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            collectionID=resultSet.getInt(1);
+        }
+
+    
+        //Enter the name of the movie you would like to add to the collection
+        System.out.println("Enter the name of the movie you would like to add: ");
+        String movieName = scanner.nextLine();
+
+        while(movieName.isEmpty()){
+            System.out.println("The movie you input was not valid.\nEnter the name of the movie you would like to add.");
+            movieName=scanner.nextLine();
+        }
+
+        statement = conn.prepareStatement("select \"movieID\" from \"movie\" where \"title\" = ?");
+        statement.setString(1, movieName);
+        
+    }
     static void deleteMovie(){}
 
 
@@ -204,7 +238,7 @@ public class collections {
         }else if (command == 3){
             deleteCollection(conn,userID);
         }else if (command == 4){
-            addMovie();
+            addMovie(conn);
         }else if (command == 5){
             deleteMovie();
         }else if (command ==6 ){
