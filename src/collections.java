@@ -1,7 +1,6 @@
 //all needed imports to do the appropriate things
 import java.util.Scanner;
 
-import java.sql.SQLException;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import java.io.BufferedReader;
@@ -45,6 +44,8 @@ public class collections {
             throw new RuntimeException(e);
         }
 
+        // System.out.println(user);
+        // System.out.println(password);
         String databaseName = "p320_16";
 
         String driverName = "org.postgresql.Driver";
@@ -60,6 +61,9 @@ public class collections {
             session.setPassword(password);
             session.setConfig(config);
             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+            session.connect();
+            System.out.println("Connected");
+
 
             int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
             String url = "jdbc:postgresql://127.0.0.1:" + assigned_port + "/" + databaseName;
@@ -75,7 +79,7 @@ public class collections {
 
             // ResultSet resultSet = statement.executeQuery();
             
-            PreparedStatement statement = conn.prepareStatement("select MAX(collecitonID) from collection ");
+            PreparedStatement statement = conn.prepareStatement("select MAX(collecitonID) from collection");
             ResultSet resultSet = statement.executeQuery();
 
             System.out.println(resultSet);
