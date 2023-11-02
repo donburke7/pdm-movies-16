@@ -165,7 +165,10 @@ public class collections {
         statement.executeUpdate();
 
         //statement = conn.prepareStatement("update \"contains")
-
+        statement = conn.prepareStatement("update \"contains\" set \"collectionName\"=? where \"collectionID\" = ?");
+        statement.setString(1, newName);
+        statement.setInt(2, collID);
+        statement.executeUpdate();
     }
 
 
