@@ -92,7 +92,12 @@ public class collections {
     }
 
 
-
+    /**
+     * Delete Collection - Deletes a whole collection 
+     * @param conn - the connection 
+     * @param userID- the user ID (got after logged in )
+     * @throws SQLException
+     */
     static void deleteCollection(Connection conn,int userID) throws SQLException{
         System.out.println("Enter the name of the collection you would like to delete: ");
         String collectionName=scanner.nextLine();
@@ -105,11 +110,13 @@ public class collections {
             collectionID=resultSet.getInt(1);
         }
 
+        //delete from collections
         System.out.println(collectionID);
         statement = conn.prepareStatement("delete from \"collection\" where \"collectionID\"=? ");
         statement.setInt(1, collectionID);
         statement.executeUpdate();
 
+        //delete from contains 
         //sql command 
         //Delete From "Collection", "Contains" WHERE collectionName = collectionName
     }
