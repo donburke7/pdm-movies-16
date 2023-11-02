@@ -33,7 +33,7 @@ public class Accounts {
     /**
      * Constructor to put userID to be used for creating account in
      */
-    public Accounts(){
+    public static void setCounterID(){
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/incrementUserID.txt"))) {
             incrementUserID = Integer.parseInt(bufferedReader.readLine());
         } catch (IOException e) {
@@ -224,7 +224,9 @@ public class Accounts {
             printBeginMenu();
             Accounts.incrementUserID+=1;
             BufferedWriter bw = new BufferedWriter(new FileWriter("src/incrementUserID.txt",false));
-            bw.write(incrementUserID);
+            String toBeStored = String.valueOf(incrementUserID);
+            bw.write(toBeStored);
+            bw.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (IOException ioe) {
@@ -284,8 +286,7 @@ public class Accounts {
             System.out.println("Database connection established");
 
             stmt = conn.createStatement();
-            Accounts acc = new Accounts();
-            // System.out.println(incrementUserID);
+            setCounterID();
             printBeginMenu();
 
             sc.close();
