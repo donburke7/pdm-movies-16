@@ -144,7 +144,7 @@ public class Accounts {
      * This prints the main menu after a user has logged in and directs them to the right path.
      */
     public static void printMainMenu() throws SQLException{
-        System.out.println("You are now logged in! Find below more functionality:\n");
+        System.out.println("Find below more functionality:\n");
 
         System.out.println("2: Access and Edit Collections"); 
         System.out.println("3: Search for Movies");
@@ -152,28 +152,36 @@ public class Accounts {
         System.out.println("5: Watch Movies");
         System.out.println("6: Follow other Users");
         System.out.println("7: Logout");
-        int input = Integer.parseInt(sc.nextLine());
-        while(input != 2 && input != 3 && input != 4 && input != 5 && input != 6 && input != 7){
-            System.out.println("Please enter valid number of command you wish to perform: \n");
+        int input = 0 ;
+        while(input != 2 && input != 3 && input != 4 && input != 5 && input != 6 && input != 7 ){
             input = Integer.parseInt(sc.nextLine());
+            switch (input) {
+                case 2:
+                    // collection work
+                    break;
+                case 3: 
+                    //search work
+                    break;
+                case 4:
+                    // rate work
+                    break;
+
+                case 5:
+                    // watch work
+                    break;
+                case 6: 
+                    // followers work
+                    break;
+
+                case 7:
+                    Logout();
+                    break;
+                default: 
+                    System.out.println("Please enter valid number of command you wish to perform: \n"); 
+            }
         }
-        if(input == 2){
-            //collection work
-        }
-        if(input == 3){
-            //search work
-        }
-        if(input == 4){
-            //rate work
-        }
-        if(input == 5){
-            //watch work
-        }
-        if(input == 6){
-            //followers work
-        }
-        else if(input == 7){
-            Logout();
+        if(input != 7){
+            printMainMenu();
         }
     }
 
