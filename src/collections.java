@@ -29,7 +29,85 @@ public class collections {
         return command;
 
     }
-    static void createCollection(int userID) throws SQLException{
+    static void createCollection(Connection conn, int userID) throws SQLException{
+        
+ // PreparedStatement statement = conn.prepareStatement("select * from movie where \"movieID\" = 19995");
+
+            // ResultSet resultSet = statement.executeQuery();
+            int collID = 0; 
+            PreparedStatement statement = conn.prepareStatement("select MAX(\"collectionID\") from \"collection\"");
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                collID= resultSet.getInt(1);
+            }
+               
+            //increment the max id by 1 
+            int newCollectionID=collID+1;
+            System.out.println(newCollectionID);
+            //prompt for the name of the collection
+            String collectionName="";
+            System.out.println("Enter a name for your collection: ");
+            String nameInput = scanner.nextLine();
+
+            
+            //check name for null
+            if( nameInput.isEmpty()){
+                collectionName="collection";
+            }else{
+                collectionName=nameInput;
+            }
+
+
+            //SQL statement to create a new collection
+            // INSERT INTO "Collection" Values(collectionID, userID, collectionName)
+            
+            //example prepared statement with variables 
+            // PreparedStatement statement = conn.prepareStatement("select * from movie where \"movieID\" = ?");
+            // statement.setInt(1,)
+            statement = conn.prepareStatement("Insert into \"collection\" values(?,?,?)");
+            statement.setInt(1,newCollectionID);
+            statement.setInt(2,userID);
+            statement.setString(3,collectionName);
+            statement.executeQuery();
+        
+       
+        //at this point, collecitonID, userID, and name are known
+        //sql statment to create colleciton
+        //INSERT INTO "Collection" Values(collectionID, userID, collectionName)
+
+        
+    }
+    
+    
+    /**
+     * Users will be able to see the list of all their collections of movies 
+     * IN ASCENDING ORDER 
+     * Collections name
+     * number of movies in the collections
+     */
+    static void viewCollections(int userID){
+        
+        System.out.println("Here is a list of your collections:\n");
+
+    }
+    static void deleteCollection(int userID){
+        System.out.println("Enter the name of the collection you would like to delete: ");
+        String collectionName=scanner.nextLine();
+        //sql command 
+        //Delete From "Collection", "Contains" WHERE collectionName = collectionName
+    }
+    static void modifyCollection(){
+        
+    }
+    static void addMovie(){}
+    static void deleteMovie(){}
+
+
+    public static void main(String[] args) throws SQLException{
+        int command = printMenu();
+        
+        
+        
         int lport = 5432; 
         String rhost = "starbug.cs.rit.edu";
         int rport = 5432; 
@@ -37,7 +115,7 @@ public class collections {
         String password; 
 
         //get the username and password for logging into the database
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader ("pdm-movies-16/src/main/credentials.txt"))){
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader ("pdm-movies-16/dataSources/credentials.txt"))){
             user = bufferedReader.readLine();
             password = bufferedReader.readLine();
         }catch (IOException e){
@@ -75,14 +153,22 @@ public class collections {
             Class.forName(driverName);
             conn = DriverManager.getConnection(url, props);
 
-            // PreparedStatement statement = conn.prepareStatement("select * from movie where \"movieID\" = 19995");
+             int userID = 2;
+        if (command == 0){
+            command=printMenu();
+        }else if (command == 1){
+            try {
+                createCollection(conn,userID);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+           
+        }else if (command == 2){
+            viewCollections(userID);
+        }else if (command == 3){
+            deleteCollection(userID);
+        }
 
-            // ResultSet resultSet = statement.executeQuery();
-            
-            PreparedStatement statement = conn.prepareStatement("select MAX(collecitonID) from collection");
-            ResultSet resultSet = statement.executeQuery();
-
-            System.out.println(resultSet);
         } catch (Exception e){
             e.printStackTrace();
         } finally {
@@ -95,81 +181,7 @@ public class collections {
                 session.disconnect();
             }
         }
-
-        
-
-        //generate next CollectionID
-        // int collectionID=generateID(); 
-        
-
-
-        
-        // //prompt for the name of the collection
-        // String collectionName="";
-        // System.out.println("Enter a name for your collection: ");
-        // String nameInput = scanner.nextLine();
-
-        // //check name for null
-        // if( nameInput.isEmpty()){
-        //     collectionName="collection";
-        // }else{
-        //     collectionName=nameInput;
-        // }
-
-        //at this point, collecitonID, userID, and name are known
-        //sql statment to create colleciton
-        //INSERT INTO "Collection" Values(collectionID, userID, collectionName)
-
-        
-    }
-    
-    static int generateID(){
-        //Select collectionID from Collections where collectionID=MAX(collectionID)
-        return 0;
-        //return ID; 
-    }
-
-    /**
-     * Users will be able to see the list of all their collections of movies 
-     * IN ASCENDING ORDER 
-     * Collections name
-     * number of movies in the collections
-     */
-    static void viewCollections(int userID){
-        
-        System.out.println("Here is a list of your collections:\n");
-
-    }
-    static void deleteCollection(int userID){
-        System.out.println("Enter the name of the collection you would like to delete: ");
-        String collectionName=scanner.nextLine();
-        //sql command 
-        //Delete From "Collection", "Contains" WHERE collectionName = collectionName
-    }
-    static void modifyCollection(){
-        
-    }
-    static void addMovie(){}
-    static void deleteMovie(){}
-
-
-    public static void main(String[] args){
-        int command = printMenu();
-        int userID = 2;
-        if (command == 0){
-            command=printMenu();
-        }else if (command == 1){
-            try {
-                createCollection(userID);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-           
-        }else if (command == 2){
-            viewCollections(userID);
-        }else if (command == 3){
-            deleteCollection(userID);
-        }
+       
 
     }
 }
