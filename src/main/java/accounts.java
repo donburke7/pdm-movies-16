@@ -247,7 +247,7 @@ public class Accounts {
         int rport = 5432;
         String user;
         String password;
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/credentials.txt"))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("dataSources/credentials.txt"))) {
             user = bufferedReader.readLine();
             password = bufferedReader.readLine();
         } catch (IOException e) {
