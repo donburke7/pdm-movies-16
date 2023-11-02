@@ -27,6 +27,7 @@ public class Accounts {
     // used for sql statements
     static Statement stmt;
 
+    static Connection conn;
     // checks if a user is logged in or not
     public static boolean loginChecker;
     
@@ -47,6 +48,13 @@ public class Accounts {
     public static int getUserID(){
         return userID;
     }
+    /**
+     * Gets connection for everyone else to use
+     * @return the connection created
+     */
+    public static Connection getConnection(){
+        return conn;
+    }
 
     public static void incrementCounterUserID(){
         incrementUserID = incrementUserID+1;
@@ -54,7 +62,7 @@ public class Accounts {
     /**
      * This prints the beginning menu when a user launches console app.
      */
-    public static void printBeginMenu(){
+    public static void printBeginMenu() throws SQLException{
         System.out.println("Welcome to the Movies Database!");
         System.out.println("Please sign in or create account with commands: \n");
         
@@ -85,7 +93,7 @@ public class Accounts {
     /**
      * This prints the main menu after a user has logged in and directs them to the right path.
      */
-    public static void printMainMenu(){
+    public static void printMainMenu() throws SQLException{
         System.out.println("You are now logged in! Find below more functionality:\n");
 
         System.out.println("2: Access and Edit Collections"); 
@@ -137,11 +145,14 @@ public class Accounts {
      * @param username the username being checked
      * @return the userID of the given username if taken or -1 otherwise
      */
-    public static int isIdTaken(String username){
-        String getIDStatment = "select \"userID\" from \"users\" where (username = '" + username + "')";
+    public static int isIdTaken(String username) throws SQLException{
+        PreparedStatement getIDStatment;
+        
+        getIDStatment = conn.prepareStatement("select \"userID\" from \"users\" where (username = ?)");
+        getIDStatment.setString(1, username);
         int tempID = -1;
         try{
-            ResultSet rset = stmt.executeQuery(getIDStatment);
+            ResultSet rset = getIDStatment.executeQuery();
             while(rset.next()){
                 tempID = rset.getInt("userID");
             }
@@ -157,16 +168,18 @@ public class Accounts {
      * This method logs in a user - storing the userID into the static var and updating the last
      * accessed timestamp.
      */
-    public static void Login(){
+    public static void Login() throws SQLException{
         System.out.println("Welcome to login. Please enter credentials below: \n");
         System.out.println("Enter username:");
         String username = sc.nextLine();
         System.out.println("Enter password:");
         String password = sc.nextLine();
         int tempID;
-        String getIDStatment = "select \"userID\" from \"users\" where (username = '" + username + "') and (password = '" + password +"')";
+        PreparedStatement getIDStatment = conn.prepareStatement("select \"userID\" from \"users\" where (username = ?) and (password = ?)");
+        getIDStatment.setString(1, username);
+        getIDStatment.setString(2, password);
         try{
-            ResultSet rset = stmt.executeQuery(getIDStatment);
+            ResultSet rset = getIDStatment.executeQuery();
             while(rset.next()){
                 tempID = rset.getInt("userID");
                 userID = tempID;
@@ -197,7 +210,7 @@ public class Accounts {
     /**
      * This method is used to create a new account and prompts user for everything but userID which is generated
      */
-    public static void createAccount(){
+    public static void createAccount() throws SQLException{
         // incrementCounterUserID();
         System.out.println("Welcome to Account Creation. Please enter credentials below: \n");
         System.out.println("Please enter first name:");
@@ -216,10 +229,17 @@ public class Accounts {
         System.out.println("Please enter new password:");
         String password = sc.nextLine();
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        String insertNewUser = "insert into users values ("+ incrementUserID+",'"+ username +"', '"+ password +"', '"+ firstName +"', '"+ lastName +"', '"+currentTime+"',"+ null + ")";
-        System.out.println("SQL IS "+ insertNewUser);
+        PreparedStatement insertNewUser = conn.prepareStatement("insert into users values (?,?, ?,?, ?, ?,?)");
+        insertNewUser.setInt(1, incrementUserID);
+        insertNewUser.setString(2,username);
+        insertNewUser.setString(3, password);
+        insertNewUser.setString(4, firstName);
+        insertNewUser.setString(5, lastName);
+        insertNewUser.setTimestamp(6, currentTime);
+        insertNewUser.setNull(7,java.sql.Types.TIMESTAMP);
+        // System.out.println("SQL IS "+ insertNewUser);
         try {
-            stmt.executeUpdate(insertNewUser);
+            insertNewUser.executeUpdate();
             System.out.println("Your account has been created, please sign in to see other functionality");
             printBeginMenu();
             Accounts.incrementUserID+=1;
@@ -258,7 +278,7 @@ public class Accounts {
         String databaseName = "p320_16"; //change to your database name
 
         String driverName = "org.postgresql.Driver";
-        Connection conn = null;
+        //Connection conn = null;
         Session session = null;
         try {
             java.util.Properties config = new java.util.Properties();
