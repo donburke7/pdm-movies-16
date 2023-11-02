@@ -228,24 +228,25 @@ public class Accounts {
         PreparedStatement getIDStatment = conn.prepareStatement("select \"userID\" from \"users\" where (username = ?) and (password = ?)");
         getIDStatment.setString(1, username);
         getIDStatment.setString(2, password);
-        try{
-            ResultSet rset = getIDStatment.executeQuery();
-            while(rset.next()){
-                tempID = rset.getInt("userID");
-                userID = tempID;
-                
-            }
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            String updateLastAccess = "update users set \"lastAccess\" = '" + currentTime +"' where \"userID\" = " + userID;
-            stmt.executeUpdate(updateLastAccess); 
-            if(isLogin()){
-                printMainMenu();
-            }
+        
+        ResultSet rset = getIDStatment.executeQuery();
+        while(rset.next()){
+            tempID = rset.getInt("userID");
+            userID = tempID;
+            
         }
-        catch(SQLException e){
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        String updateLastAccess = "update users set \"lastAccess\" = '" + currentTime +"' where \"userID\" = " + userID;
+        stmt.executeUpdate(updateLastAccess); 
+        if(isLogin()){
+            printMainMenu();
+        }
+        else{
             System.out.println("Could not login - try again or create an account");
             printBeginMenu();
         }
+        
+       
     }
 
     /**
