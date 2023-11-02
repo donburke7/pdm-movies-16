@@ -1,9 +1,4 @@
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -11,12 +6,10 @@ import java.util.*;
 public class MovieSearch {
 
     private static final int MAX_ACTOR_LIST_SIZE = 5;
-    private Connection connection;
-    private int userID;
+    private final Connection connection;
 
-    public MovieSearch(Connection connection, int userID) {
+    public MovieSearch(Connection connection) {
         this.connection = connection;
-        this.userID = userID;
     }
 
     public void movieSearch() throws SQLException {
@@ -110,7 +103,7 @@ public class MovieSearch {
         System.out.println("Do you want to search by month, year, or exact date?");
         System.out.println("1: Month\n2: Year\n3: Exact Date");
         int searchOption = scanner.nextInt();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement;
         int queryIntVar;
         switch (searchOption) {
             case 1:

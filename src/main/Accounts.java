@@ -161,7 +161,7 @@ public class Accounts {
             //collection work
         }
         if(input == 3){
-            MovieSearch movieSearch = new MovieSearch(conn, userID);
+            MovieSearch movieSearch = new MovieSearch(conn);
             movieSearch.movieSearch();
         }
         if(input == 4){
