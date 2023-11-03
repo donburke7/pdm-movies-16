@@ -2,9 +2,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter; 
 
 public class WatchMovie {
     Timestamp timestamp;
@@ -12,11 +10,13 @@ public class WatchMovie {
     Scanner scanner;
     int userID;
 
+
     public WatchMovie(Connection connection, int id) {
         scanner = new Scanner(System.in);
         this.conn = connection;
         this.userID = id;
     }
+
 
     public void movieWatch() throws SQLException {
         String movieName = "";
@@ -27,7 +27,7 @@ public class WatchMovie {
             movieName = scanner.nextLine();
             if (!movieName.isEmpty()) {
                 PreparedStatement selectMovie = 
-                conn.prepareStatement("select m.\"movieID\" from movie m where m.title = ?");
+                    conn.prepareStatement("select m.\"movieID\" from movie m where m.title = ?");
                 selectMovie.setString(1, movieName);
                 ResultSet movieResult = selectMovie.executeQuery();
                 if (!movieResult.next()) {
@@ -37,7 +37,6 @@ public class WatchMovie {
                 }
             }
         }
-
         // movie exists, so we insert a watch entry (we watch it)
         PreparedStatement statement = conn.prepareStatement("""
                     insert into watches ("userID", "movieID", "dateTimeWatched")
@@ -51,15 +50,27 @@ public class WatchMovie {
         System.out.println("You watched: \"" + movieName + "\" at " + timestamp + "!\n");
     }
 
+
     public void collectionWatch() throws SQLException {
         ArrayList<Integer> movieIds = new ArrayList<>();
         String collectionName = "";
+        // display the collections available to watch
+        System.out.println("Here are your collections:");
+        PreparedStatement selectAllCollections = 
+            conn.prepareStatement("""
+                select "collectionName" from collection where "userID" = ? order by "collectionName"
+                    """);
+        selectAllCollections.setInt(1, userID);
+        ResultSet allCollections = selectAllCollections.executeQuery();
+        while (allCollections.next()) {
+            System.out.println("- " + allCollections.getString("collectionName"));
+        }
+
         System.out.println("What collection of movies would you like to watch?: ");
-        // whole lotta nonsense just to see if the movie exists in the db
+        // whole lotta nonsense just to see if the collection exists in the db
         while (collectionName.equals("")) {
             collectionName = scanner.nextLine();
             if (!collectionName.isEmpty()) {
-                // FIGURE OUT IF IT SHOULD PULL OTHER PEOPLES COLLECTIONS OR NOT
                 PreparedStatement selectCollection = 
                 conn.prepareStatement("""
                     select con."movieID"
@@ -82,11 +93,20 @@ public class WatchMovie {
         }
 
         for (int movieId : movieIds) {
-
+            // insert a watch entry for each movie in collection (we watch them)
+            PreparedStatement statement = conn.prepareStatement("""
+                        insert into watches ("userID", "movieID", "dateTimeWatched")
+                        values (?, ?, ?)
+                        """);
+            statement.setInt(1, userID);
+            statement.setInt(2, movieId);
+            statement.setTimestamp(3, timestamp);
+            statement.executeUpdate();
         }
-
-
+        System.out.println("You just binge-watched the entirety of: \"" + 
+                                collectionName + "\" at " + timestamp + "!\n");
     }
+
 
     public void watchOptions() throws SQLException {
             boolean validInput = false;
@@ -106,24 +126,14 @@ public class WatchMovie {
                 }
                 else if (choice == 2) {
                     validInput = true;
-                    //PreparedStatement statement = conn.prepareStatement();
                     collectionWatch();
                 }
                 else { 
                     System.out.println("Invalid Input\n");
                 }
             }
-            scanner.close();
 
-            /**  watch entire collection
-             * insert ...
-             * 
-                select con."movieID"
-                from contains con
-                join collection c on con."collectionID" = c."collectionID"
-                where c."userID" = 43 and c."collectionName" = 'Pennie''s Collection'
-             * 
-             */
+            scanner.close();
     }
 }
 
