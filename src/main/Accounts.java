@@ -4,9 +4,6 @@ import java.io.*;
 import java.sql.*;
 import com.jcraft.jsch.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Properties;
 
 
@@ -38,7 +35,7 @@ public class Accounts {
         int rport = 5432;
         String user;
         String password;
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("dataSources/credentials.txt"))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("pdm-movies-16/dataSources/credentials.txt"))) {
             user = bufferedReader.readLine();
             password = bufferedReader.readLine();
         } catch (IOException e) {
@@ -144,7 +141,7 @@ public class Accounts {
      * This prints the main menu after a user has logged in and directs them to the right path.
      */
     public static void printMainMenu() throws SQLException{
-        System.out.println("You are now logged in! Find below more functionality:\n");
+        System.out.println("Find below more functionality:\n");
 
         System.out.println("2: Access and Edit Collections"); 
         System.out.println("3: Search for Movies");
@@ -152,29 +149,53 @@ public class Accounts {
         System.out.println("5: Watch Movies");
         System.out.println("6: Follow other Users");
         System.out.println("7: Logout");
-        int input = Integer.parseInt(sc.nextLine());
-        while(input != 2 && input != 3 && input != 4 && input != 5 && input != 6 && input != 7){
-            System.out.println("Please enter valid number of command you wish to perform: \n");
+        int input = 0 ;
+        while(input != 2 && input != 3 && input != 4 && input != 5 && input != 6 && input != 7 ){
             input = Integer.parseInt(sc.nextLine());
+            switch (input) {
+                case 2:
+                    // collection work
+                    collections MyCollection = new collections(userID, conn);
+                    int command = MyCollection.printMenu(); 
+                     if (command == 0){
+                        command=MyCollection.printMenu();
+                    }else if (command == 1){
+                            MyCollection.createCollection(conn,userID);
+                    }else if (command == 2){
+                         MyCollection.viewCollections(conn,userID);
+                    }else if (command == 3){
+                         MyCollection.deleteCollection(conn,userID);
+                    }else if (command == 4){
+                         MyCollection.addMovie(conn, userID);
+                    }else if (command == 5){
+                         MyCollection.deleteMovie(conn,userID);
+                    }else if (command ==6 ){
+                         MyCollection.modifyCollection(conn,userID);
+                    }
+                    break;
+                case 3: 
+                    //search work
+                    break;
+                case 4:
+                    // rate work
+                    break;
+
+                case 5:
+                    // watch work
+                    break;
+                case 6: 
+                    // followers work
+                    break;
+
+                case 7:
+                    Logout();
+                    break;
+                default: 
+                    System.out.println("Please enter valid number of command you wish to perform: \n"); 
+            }
         }
-        if(input == 2){
-            //collection work
-        }
-        if(input == 3){
-            MovieSearch movieSearch = new MovieSearch(conn);
-            movieSearch.movieSearch();
-        }
-        if(input == 4){
-            //rate work
-        }
-        if(input == 5){
-            //watch work
-        }
-        if(input == 6){
-            //followers work
-        }
-        else if(input == 7){
-            Logout();
+        if(input != 7){
+            printMainMenu();
         }
     }
 
@@ -229,24 +250,25 @@ public class Accounts {
         PreparedStatement getIDStatment = conn.prepareStatement("select \"userID\" from \"users\" where (username = ?) and (password = ?)");
         getIDStatment.setString(1, username);
         getIDStatment.setString(2, password);
-        try{
-            ResultSet rset = getIDStatment.executeQuery();
-            while(rset.next()){
-                tempID = rset.getInt("userID");
-                userID = tempID;
-                
-            }
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            String updateLastAccess = "update users set \"lastAccess\" = '" + currentTime +"' where \"userID\" = " + userID;
-            stmt.executeUpdate(updateLastAccess); 
-            if(isLogin()){
-                printMainMenu();
-            }
+        
+        ResultSet rset = getIDStatment.executeQuery();
+        while(rset.next()){
+            tempID = rset.getInt("userID");
+            userID = tempID;
+            
         }
-        catch(SQLException e){
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        String updateLastAccess = "update users set \"lastAccess\" = '" + currentTime +"' where \"userID\" = " + userID;
+        stmt.executeUpdate(updateLastAccess); 
+        if(isLogin()){
+            printMainMenu();
+        }
+        else{
             System.out.println("Could not login - try again or create an account");
             printBeginMenu();
         }
+        
+       
     }
 
     /**
