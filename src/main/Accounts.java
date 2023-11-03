@@ -169,8 +169,10 @@ public class Accounts {
                          MyCollection.addMovie(conn, userID);
                     }else if (command == 5){
                          MyCollection.deleteMovie(conn,userID);
-                    }else if (command ==6 ){
+                    }else if (command == 6 ){
                          MyCollection.modifyCollection(conn,userID);
+                    }else if (command == 7){
+                        printMainMenu();
                     }
                     break;
                 case 3: 

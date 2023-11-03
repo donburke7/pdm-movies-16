@@ -37,7 +37,8 @@ public class collections {
         System.out.println("3: Delete a collection");
         System.out.println("4: Add a movie to a collection");
         System.out.println("5: Delete a movie from a collection");
-        System.out.println("6: Modify collection\n");
+        System.out.println("6: Modify collection");
+        System.out.println("7: Return to the main menu\n");
         System.out.println("Enter the number that corresponds to the command you wish to execute:");
         int command=Integer.parseInt(scanner.nextLine());
         return command;
