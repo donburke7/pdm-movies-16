@@ -183,6 +183,8 @@ public class Accounts {
 
                 case 5:
                     // watch work
+                    WatchMovie watchMovie = new WatchMovie(conn, userID);
+                    watchMovie.watchOptions();
                     break;
                 case 6: 
                     Followers follow = new Followers(userID, conn);
