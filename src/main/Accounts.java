@@ -4,9 +4,6 @@ import java.io.*;
 import java.sql.*;
 import com.jcraft.jsch.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Properties;
 
 
@@ -168,6 +165,8 @@ public class Accounts {
 
                 case 5:
                     // watch work
+                    WatchMovie watchMovie = new WatchMovie(conn, userID);
+                    watchMovie.watchOptions();
                     break;
                 case 6: 
                     // followers work
