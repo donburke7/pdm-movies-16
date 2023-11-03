@@ -45,12 +45,12 @@ public class Followers {
         
         int result =  Integer.parseInt(scanner.nextLine());
 
-        if(result == 0){
+        if(result == 1){
             System.out.println("Enter the first name of the person you would like to follow:");
             String firstName = scanner.nextLine(); 
             System.out.println("Enter the last name of the person you would like to follow:");
             String lastName = scanner.nextLine(); 
-            PreparedStatement statement = conn.prepareStatement("select \"userID\" from \"user\" where \"fname\" = ? and \"lname\" = ? ");
+            PreparedStatement statement = conn.prepareStatement("select \"userID\" from \"users\" where \"fName\" = ? and \"lName\" = ? ");
             statement.setString(1, firstName);
             statement.setString(2, lastName);
             ResultSet resultSet = statement.executeQuery();
@@ -90,19 +90,21 @@ public class Followers {
         }else if (result==2){
             System.out.println("Enter the email address of the user you would like to follow:");
             String email = scanner.nextLine();
-            int following = 0; 
+            int following = -1; 
             PreparedStatement statement = conn.prepareStatement("select \"userID\" from \"email\" where \"email\" = ?");
             statement.setString(1, email);
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
                 following = resultSet.getInt("userID");
             }
-            if(following==0){
+            // System.out.println(following);
+            if(following==-1){
                 System.out.println("sorry the email you entered does not have an account :(");
             }else{
                 statement=conn.prepareStatement("insert into \"follows\" values(?,?)");
                 statement.setInt(1,following);
                 statement.setInt(2, userID);
+                statement.executeUpdate();
             }
         }
 
@@ -119,12 +121,12 @@ public class Followers {
         
         int result =  Integer.parseInt(scanner.nextLine());
 
-        if(result == 0){
+        if(result == 1){
             System.out.println("Enter the first name of the person you would like to unfollow:");
             String firstName = scanner.nextLine(); 
             System.out.println("Enter the last name of the person you would like to unfollow:");
             String lastName = scanner.nextLine(); 
-            PreparedStatement statement = conn.prepareStatement("select \"userID\" from \"user\" where \"fname\" = ? and \"lname\" = ? ");
+            PreparedStatement statement = conn.prepareStatement("select \"userID\" from \"users\" where \"fName\" = ? and \"lName\" = ? ");
             statement.setString(1, firstName);
             statement.setString(2, lastName);
             ResultSet resultSet = statement.executeQuery();
@@ -138,7 +140,7 @@ public class Followers {
                 System.out.println("Sorry the person you entered does not exist :(");
 
             }else if (userList.size()==1){
-                statement= conn.prepareStatement("delete from \"follows\" values (?,?)");
+                statement= conn.prepareStatement("delete from \"follows\" where \"Following\"=? and \"Follower\"=?");
                 statement.setInt(1,userList.get(0));
                 statement.setInt(2,userID);
                 statement.executeUpdate();
@@ -155,7 +157,7 @@ public class Followers {
                 } 
                 System.out.println("Please choose the number that corresponds to the correct email address for the user:");
                 int Userinput = Integer.parseInt(scanner.nextLine());
-                statement=conn.prepareStatement("delete from \"follows\" values(?,?)");
+                statement=conn.prepareStatement("delete from \"follows\" where \"Following\"=? and \"Follower\"=?");
                 statement.setInt(1, Userinput);
                 statement.setInt(2, userID);
                 statement.executeUpdate();
@@ -164,19 +166,20 @@ public class Followers {
         }else if (result==2){
             System.out.println("Enter the email address of the user you would like to unfollow:");
             String email = scanner.nextLine();
-            int following = 0; 
+            int following = -1; 
             PreparedStatement statement = conn.prepareStatement("select \"userID\" from \"email\" where \"email\" = ?");
             statement.setString(1, email);
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
                 following = resultSet.getInt("userID");
             }
-            if(following==0){
+            if(following==-1){
                 System.out.println("sorry the email you entered does not have an account :(");
             }else{
-                statement=conn.prepareStatement("delete from \"follows\" values(?,?)");
+                statement=conn.prepareStatement("delete from \"follows\" where \"Following\"=? and \"Follower\"=?");
                 statement.setInt(1,following);
                 statement.setInt(2, userID);
+                statement.executeUpdate();
             }
         }
 

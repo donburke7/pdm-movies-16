@@ -184,7 +184,15 @@ public class Accounts {
                     // watch work
                     break;
                 case 6: 
-                    // followers work
+                    Followers follow = new Followers(userID, conn);
+                    command = follow.printMenu();
+                    if (command == 0){
+                        command=follow.printMenu();
+                    }else if (command == 1){
+                            follow.followUser(userID, conn);
+                    }else if (command == 2){
+                         follow.unfollowUser(userID,conn);
+                    }
                     break;
 
                 case 7:
