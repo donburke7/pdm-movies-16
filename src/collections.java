@@ -55,7 +55,7 @@ public class collections {
                
             //increment the max id by 1 
             int newCollectionID=collID+1;
-            System.out.println(newCollectionID);
+            // System.out.println(newCollectionID);
             //prompt for the name of the collection
             String collectionName="";
             System.out.println("Enter a name for your collection: ");
@@ -256,7 +256,7 @@ public class collections {
             collectionID=resultSet.getInt(1);
         }
 
-        System.out.println(collectionID);
+        // System.out.println(collectionID);
         int movieID=-1;
         while(movieID==-1){
             String movieName="";
@@ -421,7 +421,7 @@ public class collections {
             Class.forName(driverName);
             conn = DriverManager.getConnection(url, props);
 
-             int userID = 861;
+             int userID = 927;
         if (command == 0){
             command=printMenu();
         }else if (command == 1){
