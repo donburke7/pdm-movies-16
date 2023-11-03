@@ -1,11 +1,6 @@
 //all needed imports to do the appropriate things
 import java.util.Scanner;
 import java.util.ArrayList;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.*;
 
 
@@ -42,7 +37,8 @@ public class collections {
         System.out.println("3: Delete a collection");
         System.out.println("4: Add a movie to a collection");
         System.out.println("5: Delete a movie from a collection");
-        System.out.println("6: Modify collection\n");
+        System.out.println("6: Modify collection");
+        System.out.println("7: Return to the main menu\n");
         System.out.println("Enter the number that corresponds to the command you wish to execute:");
         int command=Integer.parseInt(scanner.nextLine());
         return command;
@@ -375,100 +371,4 @@ public class collections {
     }
 
 
-
-
-
-
-
-
-
-
-
-    // public static void main(String[] args) throws SQLException{
-        // int command = printMenu();
-        
-        
-        
-        // int lport = 5432; 
-        // String rhost = "starbug.cs.rit.edu";
-        // int rport = 5432; 
-        // String user; 
-        // String password; 
-
-        // //get the username and password for logging into the database
-        // try (BufferedReader bufferedReader = new BufferedReader(new FileReader ("pdm-movies-16/dataSources/credentials.txt"))){
-        //     user = bufferedReader.readLine();
-        //     password = bufferedReader.readLine();
-        // }catch (IOException e){
-        //     throw new RuntimeException(e);
-        // }
-
-        // // System.out.println(user);
-        // // System.out.println(password);
-        // String databaseName = "p320_16";
-
-        // String driverName = "org.postgresql.Driver";
-
-        // Connection conn = null; 
-        // Session session = null;
-
-        // try{ 
-        //     java.util.Properties config = new java.util.Properties();
-        //     config.put("StrictHostKeyChecking", "no");
-        //     JSch jsch = new JSch();
-        //     session = jsch.getSession(user, rhost, 22);
-        //     session.setPassword(password);
-        //     session.setConfig(config);
-        //     session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-        //     session.connect();
-        //     System.out.println("Connected");
-
-
-        //     int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
-        //     String url = "jdbc:postgresql://127.0.0.1:" + assigned_port + "/" + databaseName;
-
-        //     java.util.Properties props = new java.util.Properties();
-        //     props.put("user", user);
-        //     props.put("password", password);
-
-        //     Class.forName(driverName);
-        //     conn = DriverManager.getConnection(url, props);
-
-        //      int userID = 927;
-//         if (command == 0){
-//             command=printMenu();
-//         }else if (command == 1){
-//             try {
-//                 createCollection(conn,userID);
-//             } catch (SQLException e) {
-//                 throw new RuntimeException(e);
-//             }
-           
-//         }else if (command == 2){
-//             viewCollections(conn,userID);
-//         }else if (command == 3){
-//             deleteCollection(conn,userID);
-//         }else if (command == 4){
-//             addMovie(conn, userID);
-//         }else if (command == 5){
-//             deleteMovie(conn,userID);
-//         }else if (command ==6 ){
-//             modifyCollection(conn,userID);
-//         }
-
-//         } catch (Exception e){
-//             e.printStackTrace();
-//         } finally {
-//             if ( conn != null && !conn.isClosed()){
-//                 System.out.println("Closing Database Connection");
-//                 conn.close();
-//             }
-//             if (session != null && session.isConnected()){
-//                 System.out.println("Closing SSH Connection");
-//                 session.disconnect();
-//             }
-//         }
-       
-
-//     }
 }
