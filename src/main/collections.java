@@ -178,7 +178,7 @@ public class collections {
         }
 
         //delete from collections
-        System.out.println(collectionID);
+        // System.out.println(collectionID);
         statement = conn.prepareStatement("delete from \"collection\" where \"collectionID\"=? ");
         statement.setInt(1, collectionID);
         statement.executeUpdate();
@@ -191,8 +191,6 @@ public class collections {
         //sql command 
         //Delete From "Collection", "Contains" WHERE collectionName = collectionName
     }
-
-
 
 
 
