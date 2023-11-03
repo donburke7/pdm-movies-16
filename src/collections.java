@@ -97,8 +97,49 @@ public class collections {
      * Collections name
      * number of movies in the collections
      */
-    static void viewCollections(int userID){
+    static void viewCollections(Connection conn, int userID)throws SQLException{
         System.out.println("Here is a list of your collections:\n");
+        PreparedStatement statement=conn.prepareStatement("(select \"collectionID\", \"collectionName\" from \"collection\" where \"userID\" =? order by \"collectionName\"  ASC)");
+        statement.setInt(1, userID);
+        ResultSet resultSet = statement.executeQuery(); 
+        ArrayList<Integer> collectionIDList=new ArrayList<Integer>();
+        ArrayList<String> collectionNameList=new ArrayList<String>();
+        while(resultSet.next()){
+            collectionIDList.add(resultSet.getInt("collectionID"));
+            collectionNameList.add(resultSet.getString("collectionName"));
+        }
+
+        for(int i =0; i< collectionIDList.size(); i++){
+            int count =0; 
+            int length=0;
+            System.out.println("Collection Name: "+collectionNameList.get(i));
+            ArrayList<Integer> movieIDList = new ArrayList<Integer>();
+            statement=conn.prepareStatement("select count(*) from \"contains\" where \"collectionID\"=? group by \"collectionID\"");
+            statement.setInt(1,collectionIDList.get(i));
+            resultSet=statement.executeQuery();
+            while(resultSet.next()){
+                // movieIDList.add(resultSet.getInt("movieID"));
+                count=resultSet.getInt(1);
+            }
+            statement=conn.prepareStatement("select \"movieID\" from \"contains\" where \"collectionID\"= ? ");
+            statement.setInt(1,collectionIDList.get(i));
+            resultSet=statement.executeQuery();
+            while(resultSet.next()){
+                movieIDList.add(resultSet.getInt("movieID"));
+            }
+            System.out.println("\tNumber of movies in the collection: "+ count);
+            for(int j =0; j<movieIDList.size(); j++){
+                statement=conn.prepareStatement("select sum(\"length\") from \"movie\" where \"movieID\"=?");
+                statement.setInt(1,movieIDList.get(i));
+                resultSet=statement.executeQuery();
+                while(resultSet.next()){
+                length+=resultSet.getInt(1);
+                }
+            }
+            System.out.println("\tThe total length of the collection is "+length+" minutes.");
+
+
+        }
 
     }
 
@@ -262,15 +303,6 @@ public class collections {
     }
 
 
-
-
-
-
-
-
-
-
-
     static void deleteMovie(Connection conn, int userID) throws SQLException{
           //enter the name of the collection you would like to add to 
         System.out.println("Enter the name of the collection you want to delete a movie from: ");
@@ -389,7 +421,7 @@ public class collections {
             Class.forName(driverName);
             conn = DriverManager.getConnection(url, props);
 
-             int userID = 972;
+             int userID = 861;
         if (command == 0){
             command=printMenu();
         }else if (command == 1){
@@ -400,7 +432,7 @@ public class collections {
             }
            
         }else if (command == 2){
-            viewCollections(userID);
+            viewCollections(conn,userID);
         }else if (command == 3){
             deleteCollection(conn,userID);
         }else if (command == 4){
