@@ -75,16 +75,6 @@ public class Accounts {
 
     }
     
-    /**
-     * Constructor to put userID to be used for creating account in
-     */
-    public static void setCounterID(){
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/incrementUserID.txt"))) {
-            incrementUserID = Integer.parseInt(bufferedReader.readLine());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
     public Session gSession(){
         return session;
     }
@@ -103,8 +93,15 @@ public class Accounts {
         return conn;
     }
 
-    public static void incrementCounterUserID(){
-        incrementUserID = incrementUserID+1;
+    public static int incrementCounterUserID()throws SQLException{
+        int counterUserID = 0; 
+            PreparedStatement statement = conn.prepareStatement("select MAX(\"userID\") from \"users\"");
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()){
+                counterUserID= resultSet.getInt(1);
+            }
+        counterUserID = counterUserID+1;
+        return counterUserID;
     }
     /**
      * This prints the beginning menu when a user launches console app.
@@ -188,6 +185,8 @@ public class Accounts {
 
                 case 5:
                     // watch work
+                    WatchMovie watchMovie = new WatchMovie(conn, userID);
+                    watchMovie.watchOptions();
                     break;
                 case 6: 
                     Followers follow = new Followers(userID, conn);
@@ -300,7 +299,7 @@ public class Accounts {
      * This method is used to create a new account and prompts user for everything but userID which is generated
      */
     public static void createAccount() throws SQLException{
-        setCounterID();
+        incrementUserID = incrementCounterUserID();
         System.out.println("Welcome to Account Creation. Please enter credentials below: \n");
         System.out.println("Please enter first name:");
         String firstName = sc.nextLine();
@@ -331,16 +330,9 @@ public class Accounts {
             insertNewUser.executeUpdate();
             System.out.println("Your account has been created, please sign in to see other functionality");
             printBeginMenu();
-            Accounts.incrementUserID+=1;
-            BufferedWriter bw = new BufferedWriter(new FileWriter("src/incrementUserID.txt",false));
-            String toBeStored = String.valueOf(incrementUserID);
-            bw.write(toBeStored);
-            bw.close();
         } catch (SQLException e) {
             e.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
+        } 
 
         
     }
