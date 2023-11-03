@@ -182,6 +182,8 @@ public class Accounts {
                     break;
                 case 4:
                     // rate work
+                    Ratings r = new Ratings(conn);
+                    r.printMenu();
                     break;
 
                 case 5:
