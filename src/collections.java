@@ -1,6 +1,6 @@
 //all needed imports to do the appropriate things
 import java.util.Scanner;
-
+import java.util.ArrayList;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import java.io.BufferedReader;
@@ -98,7 +98,6 @@ public class collections {
      * number of movies in the collections
      */
     static void viewCollections(int userID){
-        
         System.out.println("Here is a list of your collections:\n");
 
     }
@@ -203,12 +202,14 @@ public class collections {
             collectionName=scanner.nextLine();
         }
 
-        System.out.println(collectionName);
+        //System.out.println(collectionName);
         //get the id of that collection if that names exist 
         int collectionID=0;
-        PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where  \"collectionName\" is ? and \"userID\" is ?");
-        statement.setString(1, collectionName);
-        statement.setInt(2, userID);
+        // PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where \"userID\" = ? and Replace(\"collectionName\",'''','') = Replace( ?,'''','')  ");
+        PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where \"userID\" = ? and \"collectionName\" = ?  ");
+
+        statement.setString(2, collectionName);
+        statement.setInt(1, userID);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()){
             collectionID=resultSet.getInt(1);
@@ -216,35 +217,47 @@ public class collections {
 
         System.out.println(collectionID);
         int movieID=-1;
-        int counter=0;
-        // while(movieID==-1){
-        //     String movieName="";
-        //     if(counter==0){
-        //     //Enter the name of the movie you would like to add to the collection
-        //         System.out.println("Enter the name of the movie you would like to add: ");
-        //          movieName = scanner.nextLine();
-        //     }else{
-        //         System.out.println("The movie you entered did not exist, please enter another movie: ");
-        //          movieName = scanner.nextLine();
-        //     }
+        while(movieID==-1){
+            String movieName="";
+            //Enter the name of the movie you would like to add to the collection
+            System.out.println("Enter the name of the movie you would like to add: ");
+            movieName = scanner.nextLine();
+        
+            while(movieName.isEmpty()){
+                System.out.println("The movie you input was not valid.\nEnter the name of the movie you would like to add.");
+                movieName=scanner.nextLine();
+            }
+            statement = conn.prepareStatement("select \"movieID\" , \"MPAA_rating\" from \"movie\" where \"title\" = ?");
+            statement.setString(1,movieName);
+            resultSet=statement.executeQuery();
+            ArrayList<Integer> movieIDList = new ArrayList<Integer>();
+            ArrayList<String> ratingList = new ArrayList<String>();
 
-        //     while(movieName.isEmpty()){
-        //         System.out.println("The movie you input was not valid.\nEnter the name of the movie you would like to add.");
-        //         movieName=scanner.nextLine();
-        //     }
-        //     statement = conn.prepareStatement("select \"movieID\" from \"movie\" where \"title\" = ?");
-        //     statement.setString(1, movieName);
-        //     resultSet=statement.executeQuery(); 
-        //     while(resultSet.next()){
-        //         movieID=resultSet.getInt(1);
-        //     }
-        //     counter++;
-        // }
+            while(resultSet.next()){
+                movieIDList.add(resultSet.getInt("movieID"));
+                ratingList.add(resultSet.getString("MPAA_rating"));
+            }
+           
+            if (movieIDList.size()==1){
+                movieID=movieIDList.get(0);
+            }else if(movieIDList.size()>1){
+                System.out.println("There are multiple movies with that title.");
+                System.out.println("Please select the id of the movie you want to add:");
+                for(int i=0; i< movieIDList.size(); i++){
+                    System.out.println( movieIDList.get(i)+": "+movieName+" , rating: "+ratingList.get(i));
+                }
+                movieID=Integer.parseInt(scanner.nextLine());
+                
+            }
 
-        // statement = conn.prepareStatement("insert into \"contains\" values (?,?)");
-        // statement.setInt(1,collectionID);
-        // statement.setInt(2,movieID);
-        // statement.executeUpdate();
+            
+        }
+
+        statement = conn.prepareStatement("insert into \"contains\" values(?,?)");
+        statement.setInt(1,collectionID);
+        statement.setInt(2, movieID);
+        statement.executeUpdate();
+        
         
     }
 
@@ -258,7 +271,63 @@ public class collections {
 
 
 
-    static void deleteMovie(){}
+    static void deleteMovie(Connection conn, int userID) throws SQLException{
+          //enter the name of the collection you would like to add to 
+        System.out.println("Enter the name of the collection you want to delete a movie from: ");
+        String collectionName = scanner.nextLine();
+
+
+        while(collectionName.isEmpty()){
+            System.out.println("The name you input was not valid.\nEnter the name of the collection you would like to change.");
+            collectionName=scanner.nextLine();
+        }
+
+        //System.out.println(collectionName);
+        //get the id of that collection if that names exist 
+        int collectionID=0;
+        PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where  \"collectionName\" = ? and \"userID\" = ?");
+        statement.setString(1, collectionName);
+        statement.setInt(2, userID);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            collectionID=resultSet.getInt(1);
+        }
+
+        System.out.println(collectionID);
+        statement= conn.prepareStatement("select \"movieID\" from \"contains\" where \"collectionID\" = ?");
+        statement.setInt(1, collectionID);
+        resultSet=statement.executeQuery();
+        ArrayList<Integer> movieIDList = new ArrayList<Integer>();
+        while(resultSet.next()){
+            movieIDList.add(resultSet.getInt("movieID"));
+        }
+
+        ArrayList<String> movieNames = new ArrayList<String>();
+
+        for(int i=0; i< movieIDList.size(); i++){
+            int current=movieIDList.get(i);
+            statement= conn.prepareStatement("select \"title\" from \"movie\" where \"movieID\" = ?");
+            statement.setInt(1, current);
+            resultSet=statement.executeQuery();
+            while(resultSet.next()){
+                movieNames.add(resultSet.getString("title"));
+            }
+        }
+        
+        System.out.println("Here are the movies in this collection:");
+        for(int j=0; j<movieNames.size(); j++ ){
+            System.out.println(movieIDList.get(j)+": "+movieNames.get(j));
+        }
+
+        System.out.println("Enter the ID number of the movie you would like to delete: ");
+        int movieID=Integer.parseInt(scanner.nextLine());
+
+        statement = conn.prepareStatement("delete from \"contains\" where \"collectionID\" =? and \"movieID\"=?");
+        statement.setInt(1,collectionID);
+        statement.setInt(2, movieID);
+        statement.executeUpdate();
+        
+    }
 
 
 
@@ -320,7 +389,7 @@ public class collections {
             Class.forName(driverName);
             conn = DriverManager.getConnection(url, props);
 
-             int userID = 31;
+             int userID = 972;
         if (command == 0){
             command=printMenu();
         }else if (command == 1){
@@ -337,7 +406,7 @@ public class collections {
         }else if (command == 4){
             addMovie(conn, userID);
         }else if (command == 5){
-            deleteMovie();
+            deleteMovie(conn,userID);
         }else if (command ==6 ){
             modifyCollection(conn,userID);
         }
