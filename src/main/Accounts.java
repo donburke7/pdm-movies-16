@@ -194,6 +194,8 @@ public class Accounts {
                             follow.followUser(userID, conn);
                     }else if (command == 2){
                          follow.unfollowUser(userID,conn);
+                    }else if(command == 3){
+                        printMainMenu();
                     }
                     break;
 

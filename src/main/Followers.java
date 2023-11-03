@@ -24,6 +24,8 @@ public class Followers {
         System.out.println("0: Reprint the followers menu");
         System.out.println("1: Follow A User");
         System.out.println("2: Unfollow A User");
+        System.out.println("3: Return to the main menu\n");
+
         System.out.println("Enter the number that corresponds to the command you wish to execute:");
         int command=Integer.parseInt(scanner.nextLine());
         return command;
