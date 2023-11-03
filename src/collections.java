@@ -12,7 +12,15 @@ import java.sql.*;
 public class collections {
     //extend serenas file and use getter to get userID
     static Scanner scanner = new Scanner(System.in);
-     
+   
+    int userID; 
+    Connection conn;
+
+
+    public collections(int userID, Connection conn){
+        this.userID=userID; 
+        this.conn=conn;
+    }
 
     /**
      * prints the main menu 
