@@ -62,7 +62,7 @@ public class MovieSearch {
                 directorArrayList.add("Not Found");
             }
             System.out.printf("Movie Name: \"%s\" | Runtime: %d | Director: %s | MPAA Rating: %s | " +
-                    "Average User Rating :%d | Actor List: %s%n", resultSet.getString("title"),
+                    "Average User Rating: %d | Actor List: %s%n", resultSet.getString("title"),
                     resultSet.getInt("length"), directorArrayList.get(0),
                     resultSet.getString("MPAA_rating"), resultSet.getLong("rating"),
                     actorArrayList.subList(0, Math.min(MAX_ACTOR_LIST_SIZE, actorArrayList.size())));
