@@ -175,6 +175,8 @@ public class Accounts {
                     break;
                 case 3: 
                     //search work
+                    MovieSearch movieSearch = new MovieSearch(conn);
+                    movieSearch.movieSearch();
                     break;
                 case 4:
                     // rate work
