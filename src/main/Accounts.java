@@ -166,8 +166,10 @@ public class Accounts {
                          MyCollection.addMovie(conn, userID);
                     }else if (command == 5){
                          MyCollection.deleteMovie(conn,userID);
-                    }else if (command ==6 ){
+                    }else if (command == 6 ){
                          MyCollection.modifyCollection(conn,userID);
+                    }else if (command == 7){
+                        printMainMenu();
                     }
                     break;
                 case 3: 
@@ -183,7 +185,17 @@ public class Accounts {
                     // watch work
                     break;
                 case 6: 
-                    // followers work
+                    Followers follow = new Followers(userID, conn);
+                    command = follow.printMenu();
+                    if (command == 0){
+                        command=follow.printMenu();
+                    }else if (command == 1){
+                            follow.followUser(userID, conn);
+                    }else if (command == 2){
+                         follow.unfollowUser(userID,conn);
+                    }else if(command == 3){
+                        printMainMenu();
+                    }
                     break;
 
                 case 7:
