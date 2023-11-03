@@ -4,9 +4,6 @@ import java.io.*;
 import java.sql.*;
 import com.jcraft.jsch.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Properties;
 
 
@@ -38,7 +35,7 @@ public class Accounts {
         int rport = 5432;
         String user;
         String password;
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("dataSources/credentials.txt"))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("pdm-movies-16/dataSources/credentials.txt"))) {
             user = bufferedReader.readLine();
             password = bufferedReader.readLine();
         } catch (IOException e) {
@@ -158,6 +155,23 @@ public class Accounts {
             switch (input) {
                 case 2:
                     // collection work
+                    collections MyCollection = new collections(userID, conn);
+                    int command = MyCollection.printMenu(); 
+                     if (command == 0){
+                        command=MyCollection.printMenu();
+                    }else if (command == 1){
+                            MyCollection.createCollection(conn,userID);
+                    }else if (command == 2){
+                         MyCollection.viewCollections(conn,userID);
+                    }else if (command == 3){
+                         MyCollection.deleteCollection(conn,userID);
+                    }else if (command == 4){
+                         MyCollection.addMovie(conn, userID);
+                    }else if (command == 5){
+                         MyCollection.deleteMovie(conn,userID);
+                    }else if (command ==6 ){
+                         MyCollection.modifyCollection(conn,userID);
+                    }
                     break;
                 case 3: 
                     //search work

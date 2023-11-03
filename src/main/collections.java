@@ -22,11 +22,18 @@ public class collections {
         this.conn=conn;
     }
 
-    /**
+    public int getUserID(){
+        return userID;
+    }
+
+    public Connection getConnection(){ 
+        return conn; 
+    }
+     /**
      * prints the main menu 
      * @return
      */
-    static int printMenu() {
+     public int printMenu() {
         System.out.println("\nWelcome to the collections menu!");
         System.out.println("Here are the available commands:\n");
         System.out.println("0: Reprint the collections menu");
@@ -49,7 +56,7 @@ public class collections {
      * @param userID
      * @throws SQLException
      */
-    static void createCollection(Connection conn, int userID) throws SQLException{
+    public void createCollection(Connection conn, int userID) throws SQLException{
         
  // PreparedStatement statement = conn.prepareStatement("select * from movie where \"movieID\" = 19995");
 
@@ -88,7 +95,7 @@ public class collections {
             statement.setInt(1,newCollectionID);
             statement.setInt(2,userID);
             statement.setString(3,collectionName);
-            statement.executeQuery();
+            statement.executeUpdate();
         
        
         //at this point, collecitonID, userID, and name are known
@@ -105,7 +112,7 @@ public class collections {
      * Collections name
      * number of movies in the collections
      */
-    static void viewCollections(Connection conn, int userID)throws SQLException{
+    public  void viewCollections(Connection conn, int userID)throws SQLException{
         System.out.println("Here is a list of your collections:\n");
         PreparedStatement statement=conn.prepareStatement("(select \"collectionID\", \"collectionName\" from \"collection\" where \"userID\" =? order by \"collectionName\"  ASC)");
         statement.setInt(1, userID);
@@ -158,7 +165,7 @@ public class collections {
      * @param userID- the user ID (got after logged in )
      * @throws SQLException
      */
-    static void deleteCollection(Connection conn,int userID) throws SQLException{
+    public void deleteCollection(Connection conn,int userID) throws SQLException{
         System.out.println("Enter the name of the collection you would like to delete: ");
         String collectionName=scanner.nextLine();
         int collectionID=0;
@@ -195,7 +202,7 @@ public class collections {
      * @param userID- the userID
      * @throws SQLException
      */
-    static void modifyCollection(Connection conn, int userID) throws SQLException{
+    public void modifyCollection(Connection conn, int userID) throws SQLException{
         System.out.println("Enter the name of the collection you would like to change: ");
         String oldName = scanner.nextLine();
 
@@ -240,7 +247,7 @@ public class collections {
 
 
 
-    static void addMovie(Connection conn, int userID) throws SQLException{
+    public void addMovie(Connection conn, int userID) throws SQLException{
         //enter the name of the collection you would like to add to 
         System.out.println("Enter the name of the collection you want to add a movie to: ");
         String collectionName = scanner.nextLine();
@@ -311,7 +318,7 @@ public class collections {
     }
 
 
-    static void deleteMovie(Connection conn, int userID) throws SQLException{
+    public void deleteMovie(Connection conn, int userID) throws SQLException{
           //enter the name of the collection you would like to add to 
         System.out.println("Enter the name of the collection you want to delete a movie from: ");
         String collectionName = scanner.nextLine();
@@ -379,91 +386,91 @@ public class collections {
 
 
 
-    public static void main(String[] args) throws SQLException{
-        int command = printMenu();
+    // public static void main(String[] args) throws SQLException{
+        // int command = printMenu();
         
         
         
-        int lport = 5432; 
-        String rhost = "starbug.cs.rit.edu";
-        int rport = 5432; 
-        String user; 
-        String password; 
+        // int lport = 5432; 
+        // String rhost = "starbug.cs.rit.edu";
+        // int rport = 5432; 
+        // String user; 
+        // String password; 
 
-        //get the username and password for logging into the database
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader ("pdm-movies-16/dataSources/credentials.txt"))){
-            user = bufferedReader.readLine();
-            password = bufferedReader.readLine();
-        }catch (IOException e){
-            throw new RuntimeException(e);
-        }
+        // //get the username and password for logging into the database
+        // try (BufferedReader bufferedReader = new BufferedReader(new FileReader ("pdm-movies-16/dataSources/credentials.txt"))){
+        //     user = bufferedReader.readLine();
+        //     password = bufferedReader.readLine();
+        // }catch (IOException e){
+        //     throw new RuntimeException(e);
+        // }
 
-        // System.out.println(user);
-        // System.out.println(password);
-        String databaseName = "p320_16";
+        // // System.out.println(user);
+        // // System.out.println(password);
+        // String databaseName = "p320_16";
 
-        String driverName = "org.postgresql.Driver";
+        // String driverName = "org.postgresql.Driver";
 
-        Connection conn = null; 
-        Session session = null;
+        // Connection conn = null; 
+        // Session session = null;
 
-        try{ 
-            java.util.Properties config = new java.util.Properties();
-            config.put("StrictHostKeyChecking", "no");
-            JSch jsch = new JSch();
-            session = jsch.getSession(user, rhost, 22);
-            session.setPassword(password);
-            session.setConfig(config);
-            session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-            session.connect();
-            System.out.println("Connected");
+        // try{ 
+        //     java.util.Properties config = new java.util.Properties();
+        //     config.put("StrictHostKeyChecking", "no");
+        //     JSch jsch = new JSch();
+        //     session = jsch.getSession(user, rhost, 22);
+        //     session.setPassword(password);
+        //     session.setConfig(config);
+        //     session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+        //     session.connect();
+        //     System.out.println("Connected");
 
 
-            int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
-            String url = "jdbc:postgresql://127.0.0.1:" + assigned_port + "/" + databaseName;
+        //     int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
+        //     String url = "jdbc:postgresql://127.0.0.1:" + assigned_port + "/" + databaseName;
 
-            java.util.Properties props = new java.util.Properties();
-            props.put("user", user);
-            props.put("password", password);
+        //     java.util.Properties props = new java.util.Properties();
+        //     props.put("user", user);
+        //     props.put("password", password);
 
-            Class.forName(driverName);
-            conn = DriverManager.getConnection(url, props);
+        //     Class.forName(driverName);
+        //     conn = DriverManager.getConnection(url, props);
 
-             int userID = 927;
-        if (command == 0){
-            command=printMenu();
-        }else if (command == 1){
-            try {
-                createCollection(conn,userID);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+        //      int userID = 927;
+//         if (command == 0){
+//             command=printMenu();
+//         }else if (command == 1){
+//             try {
+//                 createCollection(conn,userID);
+//             } catch (SQLException e) {
+//                 throw new RuntimeException(e);
+//             }
            
-        }else if (command == 2){
-            viewCollections(conn,userID);
-        }else if (command == 3){
-            deleteCollection(conn,userID);
-        }else if (command == 4){
-            addMovie(conn, userID);
-        }else if (command == 5){
-            deleteMovie(conn,userID);
-        }else if (command ==6 ){
-            modifyCollection(conn,userID);
-        }
+//         }else if (command == 2){
+//             viewCollections(conn,userID);
+//         }else if (command == 3){
+//             deleteCollection(conn,userID);
+//         }else if (command == 4){
+//             addMovie(conn, userID);
+//         }else if (command == 5){
+//             deleteMovie(conn,userID);
+//         }else if (command ==6 ){
+//             modifyCollection(conn,userID);
+//         }
 
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            if ( conn != null && !conn.isClosed()){
-                System.out.println("Closing Database Connection");
-                conn.close();
-            }
-            if (session != null && session.isConnected()){
-                System.out.println("Closing SSH Connection");
-                session.disconnect();
-            }
-        }
+//         } catch (Exception e){
+//             e.printStackTrace();
+//         } finally {
+//             if ( conn != null && !conn.isClosed()){
+//                 System.out.println("Closing Database Connection");
+//                 conn.close();
+//             }
+//             if (session != null && session.isConnected()){
+//                 System.out.println("Closing SSH Connection");
+//                 session.disconnect();
+//             }
+//         }
        
 
-    }
+//     }
 }
