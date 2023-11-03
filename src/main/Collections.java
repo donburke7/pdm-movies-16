@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.sql.*;
 
 
-public class collections {
+public class Collections {
     //extend serenas file and use getter to get userID
     static Scanner scanner = new Scanner(System.in);
    
@@ -12,7 +12,7 @@ public class collections {
     public Connection conn;
 
 
-    public collections(int userID, Connection conn){
+    public Collections(int userID, Connection conn){
         this.userID=userID; 
         this.conn=conn;
     }
@@ -28,21 +28,49 @@ public class collections {
      * prints the main menu 
      * @return
      */
-     public int printMenu() {
-        System.out.println("\nWelcome to the collections menu!");
-        System.out.println("Here are the available commands:\n");
-        System.out.println("0: Reprint the collections menu");
-        System.out.println("1: Create a collection");
-        System.out.println("2: View a List of Your Collections");
-        System.out.println("3: Delete a collection");
-        System.out.println("4: Add a movie to a collection");
-        System.out.println("5: Delete a movie from a collection");
-        System.out.println("6: Modify collection");
-        System.out.println("7: Return to the main menu\n");
-        System.out.println("Enter the number that corresponds to the command you wish to execute:");
-        int command=Integer.parseInt(scanner.nextLine());
-        return command;
+     public void printMenu() throws SQLException {
+         int command = 0;
+         while (command != 7) {
+             System.out.println("\nWelcome to the collections menu!");
+             System.out.println("Here are the available commands:\n");
+             System.out.println("0: Reprint the collections menu");
+             System.out.println("1: Create a collection");
+             System.out.println("2: View a List of Your Collections");
+             System.out.println("3: Delete a collection");
+             System.out.println("4: Add a movie to a collection");
+             System.out.println("5: Delete a movie from a collection");
+             System.out.println("6: Modify collection");
+             System.out.println("7: Return to the main menu\n");
+             System.out.println("Enter the number that corresponds to the command you wish to execute:");
+             command = scanner.nextInt();
 
+             switch (command) {
+                 case 0:
+                     break;
+                 case 1:
+                     createCollection();
+                     break;
+                 case 2:
+                     viewCollections();
+                     break;
+                 case 3:
+                     deleteCollection();
+                     break;
+                 case 4:
+                     addMovie();
+                     break;
+                 case 5:
+                     deleteMovie();
+                     break;
+                 case 6:
+                     modifyCollection();
+                     break;
+                 case 7:
+                     break;
+                 default:
+                     System.out.println("Please pick a valid number");
+             }
+         }
     }
 
     /**
@@ -52,7 +80,7 @@ public class collections {
      * @param userID
      * @throws SQLException
      */
-    public void createCollection(Connection conn, int userID) throws SQLException{
+    public void createCollection() throws SQLException{
         
  // PreparedStatement statement = conn.prepareStatement("select * from movie where \"movieID\" = 19995");
 
@@ -108,7 +136,7 @@ public class collections {
      * Collections name
      * number of movies in the collections
      */
-    public  void viewCollections(Connection conn, int userID)throws SQLException{
+    public  void viewCollections()throws SQLException{
         System.out.println("Here is a list of your collections:\n");
         PreparedStatement statement=conn.prepareStatement("(select \"collectionID\", \"collectionName\" from \"collection\" where \"userID\" =? order by \"collectionName\"  ASC)");
         statement.setInt(1, userID);
@@ -161,7 +189,7 @@ public class collections {
      * @param userID- the user ID (got after logged in )
      * @throws SQLException
      */
-    public void deleteCollection(Connection conn,int userID) throws SQLException{
+    public void deleteCollection() throws SQLException{
         System.out.println("Enter the name of the collection you would like to delete: ");
         String collectionName=scanner.nextLine();
         int collectionID=0;
@@ -196,7 +224,7 @@ public class collections {
      * @param userID- the userID
      * @throws SQLException
      */
-    public void modifyCollection(Connection conn, int userID) throws SQLException{
+    public void modifyCollection() throws SQLException{
         System.out.println("Enter the name of the collection you would like to change: ");
         String oldName = scanner.nextLine();
 
@@ -241,7 +269,7 @@ public class collections {
 
 
 
-    public void addMovie(Connection conn, int userID) throws SQLException{
+    public void addMovie() throws SQLException{
         //enter the name of the collection you would like to add to 
         System.out.println("Enter the name of the collection you want to add a movie to: ");
         String collectionName = scanner.nextLine();
@@ -312,7 +340,7 @@ public class collections {
     }
 
 
-    public void deleteMovie(Connection conn, int userID) throws SQLException{
+    public void deleteMovie() throws SQLException{
           //enter the name of the collection you would like to add to 
         System.out.println("Enter the name of the collection you want to delete a movie from: ");
         String collectionName = scanner.nextLine();

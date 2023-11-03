@@ -23,6 +23,7 @@ public class Accounts {
     // used for sql statements
     static Statement stmt;
 
+    // connection to ssh and database
     static Connection conn;
     static Session session;
     // checks if a user is logged in or not
@@ -54,9 +55,9 @@ public class Accounts {
         session.setConfig(config);
         session.setConfig("PreferredAuthentications","publickey,keyboard-interactive,password");
         session.connect();
-        System.out.println("Connected");
+//        System.out.println("Connected");
         int assigned_port = session.setPortForwardingL(lport, "127.0.0.1", rport);
-        System.out.println("Port Forwarded");
+//        System.out.println("Port Forwarded");
 
         // Assigned port could be different from 5432 but rarely happens
         String url = "jdbc:postgresql://127.0.0.1:"+ assigned_port + "/" + databaseName;
@@ -68,7 +69,7 @@ public class Accounts {
 
         Class.forName(driverName);
         conn = DriverManager.getConnection(url, props);
-        System.out.println("Database connection established");
+//        System.out.println("Database connection established");
 
         stmt = conn.createStatement();
 
@@ -152,25 +153,8 @@ public class Accounts {
             switch (input) {
                 case 2:
                     // collection work
-                    collections MyCollection = new collections(userID, conn);
-                    int command = MyCollection.printMenu(); 
-                     if (command == 0){
-                        command=MyCollection.printMenu();
-                    }else if (command == 1){
-                            MyCollection.createCollection(conn,userID);
-                    }else if (command == 2){
-                         MyCollection.viewCollections(conn,userID);
-                    }else if (command == 3){
-                         MyCollection.deleteCollection(conn,userID);
-                    }else if (command == 4){
-                         MyCollection.addMovie(conn, userID);
-                    }else if (command == 5){
-                         MyCollection.deleteMovie(conn,userID);
-                    }else if (command == 6 ){
-                         MyCollection.modifyCollection(conn,userID);
-                    }else if (command == 7){
-                        printMainMenu();
-                    }
+                    Collections myCollection = new Collections(userID, conn);
+                    myCollection.printMenu();
                     break;
                 case 3: 
                     //search work
@@ -190,16 +174,7 @@ public class Accounts {
                     break;
                 case 6: 
                     Followers follow = new Followers(userID, conn);
-                    command = follow.printMenu();
-                    if (command == 0){
-                        command=follow.printMenu();
-                    }else if (command == 1){
-                            follow.followUser(userID, conn);
-                    }else if (command == 2){
-                         follow.unfollowUser(userID,conn);
-                    }else if(command == 3){
-                        printMainMenu();
-                    }
+                    follow.printMenu();
                     break;
 
                 case 7:
