@@ -18,19 +18,36 @@ public class Followers {
         this.conn=conn;
     }
 
-    public int printMenu(){
-        System.out.println("\nWelcome to the followers menu!");
-        System.out.println("Here are the available commands:\n");
-        System.out.println("0: Reprint the followers menu");
-        System.out.println("1: Follow A User");
-        System.out.println("2: Unfollow A User");
-        System.out.println("3: Return to the main menu\n");
+    public void printMenu() throws SQLException {
+        int command = 0;
+        while (command != 3) {
+            System.out.println("\nWelcome to the followers menu!");
+            System.out.println("Here are the available commands:\n");
+            System.out.println("0: Reprint the followers menu");
+            System.out.println("1: Follow A User");
+            System.out.println("2: Unfollow A User");
+            System.out.println("3: Return to the main menu\n");
 
-        System.out.println("Enter the number that corresponds to the command you wish to execute:");
-        int command=Integer.parseInt(scanner.nextLine());
-        return command;
+            System.out.println("Enter the number that corresponds to the command you wish to execute:");
+            command = scanner.nextInt();
+
+            switch (command) {
+                case 0:
+                    break;
+                case 1:
+                    followUser();
+                    break;
+                case 2:
+                    unfollowUser();
+                    break;
+                case 3:
+                    break;
+                default:
+                    System.out.println("Please pick a valid number");
+            }
+        }
     }
-    public void followUser(int userID, Connection conn) throws SQLException{
+    public void followUser() throws SQLException{
         // String firstName="";
         // System.out.println("Enter the email of the user you would like to follow:");
         // String email= scanner.nextLine();
@@ -115,7 +132,7 @@ public class Followers {
     
     }
 
-     public void unfollowUser(int userID, Connection conn) throws SQLException{
+     public void unfollowUser() throws SQLException{
         
         System.out.println("You have selected to unfollow a user.\nEnter the number that corresponds to one of the following options:");
         System.out.println("1: Unfollow a user by Name");

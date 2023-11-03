@@ -21,14 +21,14 @@ public class main {
         } finally {
             try {
                 if (conn != null && !conn.isClosed()) {
-                    System.out.println("Closing Database Connection");
+//                    System.out.println("Closing Database Connection");
                     conn.close();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             if (session != null && session.isConnected()) {
-                System.out.println("Closing SSH Connection");
+//                System.out.println("Closing SSH Connection");
                 session.disconnect();
             }
         }
