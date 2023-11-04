@@ -74,10 +74,8 @@ public class Collections {
     }
 
     /**
-     * Create collection- creates a new colleciton in collection table
+     * Create collection-creates a new colleciton in collection table
      * Default name if no input is Collection
-     * @param conn
-     * @param userID
      * @throws SQLException
      */
     public void createCollection() throws SQLException{
@@ -98,7 +96,7 @@ public class Collections {
             //prompt for the name of the collection
             String collectionName="";
             System.out.println("Enter a name for your collection: ");
-            String nameInput = scanner.nextLine();
+            String nameInput = scanner.next();
 
             
             //check name for null
@@ -169,7 +167,7 @@ public class Collections {
             System.out.println("\tNumber of movies in the collection: "+ count);
             for(int j =0; j<movieIDList.size(); j++){
                 statement=conn.prepareStatement("select sum(\"length\") from \"movie\" where \"movieID\"=?");
-                statement.setInt(1,movieIDList.get(i));
+                statement.setInt(1,movieIDList.get(i-1));
                 resultSet=statement.executeQuery();
                 while(resultSet.next()){
                 length+=resultSet.getInt(1);
@@ -184,14 +182,12 @@ public class Collections {
 
 
     /**
-     * Delete Collection - Deletes a whole collection from collections and contains 
-     * @param conn - the connection 
-     * @param userID- the user ID (got after logged in )
+     * Delete Collection - Deletes a whole collection from collections and contains
      * @throws SQLException
      */
     public void deleteCollection() throws SQLException{
         System.out.println("Enter the name of the collection you would like to delete: ");
-        String collectionName=scanner.nextLine();
+        String collectionName=scanner.next();
         int collectionID=0;
         PreparedStatement statement = conn.prepareStatement("select \"collectionID\" from \"collection\" where \"collectionName\" =? and \"userID\"=?");
         statement.setString(1,collectionName);
@@ -226,16 +222,16 @@ public class Collections {
      */
     public void modifyCollection() throws SQLException{
         System.out.println("Enter the name of the collection you would like to change: ");
-        String oldName = scanner.nextLine();
+        String oldName = scanner.next();
 
         while(oldName.isEmpty()){
             System.out.println("The name you input was not valid.\nEnter the name of the collection you would like to change.");
-            oldName=scanner.nextLine();
+            oldName=scanner.next();
         }
 
         System.out.println("Enter the new collection name: " );
         String newName = "";
-        String nameInput=scanner.nextLine();
+        String nameInput=scanner.next();
         if(nameInput.isEmpty()){
             newName = "collection";
         }else{{ 
@@ -272,12 +268,12 @@ public class Collections {
     public void addMovie() throws SQLException{
         //enter the name of the collection you would like to add to 
         System.out.println("Enter the name of the collection you want to add a movie to: ");
-        String collectionName = scanner.nextLine();
+        String collectionName = scanner.next();
 
 
         while(collectionName.isEmpty()){
             System.out.println("The name you input was not valid.\nEnter the name of the collection you would like to change.");
-            collectionName=scanner.nextLine();
+            collectionName=scanner.next();
         }
 
         //System.out.println(collectionName);
@@ -299,11 +295,11 @@ public class Collections {
             String movieName="";
             //Enter the name of the movie you would like to add to the collection
             System.out.println("Enter the name of the movie you would like to add: ");
-            movieName = scanner.nextLine();
+            movieName = scanner.next();
         
             while(movieName.isEmpty()){
                 System.out.println("The movie you input was not valid.\nEnter the name of the movie you would like to add.");
-                movieName=scanner.nextLine();
+                movieName=scanner.next();
             }
             statement = conn.prepareStatement("select \"movieID\" , \"MPAA_rating\" from \"movie\" where \"title\" = ?");
             statement.setString(1,movieName);
@@ -324,7 +320,7 @@ public class Collections {
                 for(int i=0; i< movieIDList.size(); i++){
                     System.out.println( movieIDList.get(i)+": "+movieName+" , rating: "+ratingList.get(i));
                 }
-                movieID=Integer.parseInt(scanner.nextLine());
+                movieID=Integer.parseInt(scanner.next());
                 
             }
 
@@ -343,12 +339,12 @@ public class Collections {
     public void deleteMovie() throws SQLException{
           //enter the name of the collection you would like to add to 
         System.out.println("Enter the name of the collection you want to delete a movie from: ");
-        String collectionName = scanner.nextLine();
+        String collectionName = scanner.next();
 
 
         while(collectionName.isEmpty()){
             System.out.println("The name you input was not valid.\nEnter the name of the collection you would like to change.");
-            collectionName=scanner.nextLine();
+            collectionName=scanner.next();
         }
 
         //System.out.println(collectionName);
@@ -389,7 +385,7 @@ public class Collections {
         }
 
         System.out.println("Enter the ID number of the movie you would like to delete: ");
-        int movieID=Integer.parseInt(scanner.nextLine());
+        int movieID=Integer.parseInt(scanner.next());
 
         statement = conn.prepareStatement("delete from \"contains\" where \"collectionID\" =? and \"movieID\"=?");
         statement.setInt(1,collectionID);

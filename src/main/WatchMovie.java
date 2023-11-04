@@ -109,31 +109,33 @@ public class WatchMovie {
 
 
     public void watchOptions() throws SQLException {
-            boolean validInput = false;
-            while (!validInput) {
+            boolean isValidInput = true;
+            while (isValidInput) {
                 System.out.println("Would you like to watch a movie or a collection of movies?");
+                System.out.println("Select 3 to go back to the main menu");
                 System.out.println("1: Movie");
                 System.out.println("2: Collection");
                 int choice = scanner.nextInt();
 
                 String date = LocalDate.now().toString();
-                String dateTime = date + " " + LocalTime.now().toString();
+                String dateTime = date + " " + LocalTime.now();
                 this.timestamp = Timestamp.valueOf(dateTime);
                 
                 if (choice == 1) {
-                    validInput = true;
+                    isValidInput = true;
                     movieWatch();
                 }
                 else if (choice == 2) {
-                    validInput = true;
+                    isValidInput = true;
                     collectionWatch();
-                }
-                else { 
+                } else if (choice == 3) {
+                    isValidInput = false;
+                } else {
                     System.out.println("Invalid Input\n");
                 }
             }
 
-            scanner.close();
+//            scanner.close();
     }
 }
 
