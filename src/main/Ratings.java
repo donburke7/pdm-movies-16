@@ -11,9 +11,11 @@ import java.util.Scanner;
 public class Ratings {
 
     private Connection c;
+    private int userid;
 
-    public Ratings(Connection c) {
+    public Ratings(Connection c, int userID) {
         this.c = c;
+        this.userid = userID;
     }
 
     public void printMenu() throws SQLException {
@@ -95,7 +97,7 @@ public class Ratings {
                             " ON CONFLICT (userid, movieid) DO UPDATE SET rating = excluded.rating"
             );
 
-            insert.setInt(1, 1);
+            insert.setInt(1, userid);
             insert.setString(2, movieName);
             insert.setInt(3, rating);
 

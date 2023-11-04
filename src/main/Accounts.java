@@ -163,7 +163,7 @@ public class Accounts {
                     break;
                 case 4:
                     // rate work
-                    Ratings r = new Ratings(conn);
+                    Ratings r = new Ratings(conn, userID);
                     r.printMenu();
                     break;
 
