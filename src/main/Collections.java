@@ -167,7 +167,7 @@ public class Collections {
             System.out.println("\tNumber of movies in the collection: "+ count);
             for(int j =0; j<movieIDList.size(); j++){
                 statement=conn.prepareStatement("select sum(\"length\") from \"movie\" where \"movieID\"=?");
-                statement.setInt(1,movieIDList.get(i-1));
+                statement.setInt(1,movieIDList.get(i));
                 resultSet=statement.executeQuery();
                 while(resultSet.next()){
                 length+=resultSet.getInt(1);
