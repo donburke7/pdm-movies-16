@@ -146,9 +146,10 @@ public class Accounts {
         System.out.println("4: Rate Movies");
         System.out.println("5: Watch Movies");
         System.out.println("6: Follow other Users");
-        System.out.println("7: Logout");
+        System.out.println("8: Recommendations");
+        System.out.println("9: Logout");
         int input = 0 ;
-        while(input != 2 && input != 3 && input != 4 && input != 5 && input != 6 && input != 7 ){
+        while(input != 2 && input != 3 && input != 4 && input != 5 && input != 6 && input != 8 && input != 9 ){
             input = Integer.parseInt(sc.nextLine());
             switch (input) {
                 case 2:
@@ -176,15 +177,18 @@ public class Accounts {
                     Followers follow = new Followers(userID, conn);
                     follow.printMenu();
                     break;
-
-                case 7:
+                case 8:
+                    Recomendations recomendations = new Recomendations(conn, userID);
+                    recomendations.runRecommendations();
+                    break;
+                case 9:
                     Logout();
                     break;
                 default: 
                     System.out.println("Please enter valid number of command you wish to perform: \n"); 
             }
         }
-        if(input != 7){
+        if(input != 9){
             printMainMenu();
         }
     }
