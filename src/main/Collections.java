@@ -40,7 +40,13 @@ public class Collections {
              System.out.println("4: Add a movie to a collection");
              System.out.println("5: Delete a movie from a collection");
              System.out.println("6: Modify collection");
-             System.out.println("7: Return to the main menu\n");
+             System.out.println("7: View the number of collections you have");
+             System.out.println("8: View the number of users who follow you");
+             System.out.println("9: View the number of users you follow");
+             System.out.println("10: View your top ten movies");
+
+
+             System.out.println("11: Return to the main menu\n");
              System.out.println("Enter the number that corresponds to the command you wish to execute:");
              command = Integer.parseInt(scanner.nextLine());
 
@@ -392,5 +398,60 @@ public class Collections {
         
     }
 
+    public void numCollections() throws SQLException{
+        int collectionCount=0;
+        PreparedStatement statement = conn.prepareStatement("select count(*) from \"collection\" where \"userID\" = ?");
+        statment.setInt(1,userID);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            collectionCount=resultSet.getInt(1);
+        }
+        System.out.println("You have "+collectionCount+" collections.");
+    }
+
+    /**
+     * the count of who this user follows
+     */
+    public void followsCount() throws SQLException{
+        int followCount=0;
+        PreparedStatement statement = conn.prepareStatement("select count(*) from \"follows\" where \"Follower\"=?");
+        statement.setInt(1,userID);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            followCount=resultSet.getInt(1);
+        }
+        System.out.println("You are following "+followCount+" users.");
+    }
+
+     /**
+     * the count of users who follow this person 
+     */
+    public void followingCount() throws SQLException{
+        int followCount=0;
+        PreparedStatement statement = conn.prepareStatement("select count(*) from \"follows\" where \"Following\"=?");
+        statement.setInt(1,userID);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            followCount=resultSet.getInt(1);
+        }
+        System.out.println("You have "+followCount+" followers.");
+    }
+
+    public void topTen() throws SQLException{
+        System.out.println("Here is the Top 10 filter options:");
+        System.out.println("1: Filter by highest rating");
+        System.out.println("2: Filter by most plays");
+        System.out.println("3: Filter by both highest rating and most plays");
+        System.out.println("Enter the option number you would like to filter by:");
+
+        
+
+    }
+
+    public ArrayList<String> mostPlays() throws SQLException{
+        ArrayList<String> movieNames = new ArrayList<String>();
+
+        return movieNames;
+    }
 
 }
