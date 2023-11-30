@@ -149,7 +149,7 @@ public class Accounts {
         System.out.println("8: Recommendations");
         System.out.println("9: Logout");
         int input = 0 ;
-        while(input != 2 && input != 3 && input != 4 && input != 5 && input != 6 && input != 8 && input != 9 ){
+        while(input != 2 && input != 3 && input != 4 && input != 5 && input != 6 && input !=7 &&input != 8 && input != 9 ){
             input = Integer.parseInt(sc.nextLine());
             switch (input) {
                 case 2:
@@ -177,6 +177,9 @@ public class Accounts {
                     Followers follow = new Followers(userID, conn);
                     follow.printMenu();
                     break;
+                case 7:
+                    Collections collection = new Collections(userID,conn);
+                    collection.printMenu();
                 case 8:
                     Recomendations recomendations = new Recomendations(conn, userID);
                     recomendations.runRecommendations();
