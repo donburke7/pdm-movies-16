@@ -146,6 +146,7 @@ public class Accounts {
         System.out.println("4: Rate Movies");
         System.out.println("5: Watch Movies");
         System.out.println("6: Follow other Users");
+        System.out.println("7: Manage Collections");
         System.out.println("8: Recommendations");
         System.out.println("9: Logout");
         int input = 0 ;

@@ -30,7 +30,7 @@ public class Collections {
      */
      public void printMenu() throws SQLException {
          int command = 0;
-         while (command != 7) {
+         while (command != 11) {
              System.out.println("\nWelcome to the collections menu!");
              System.out.println("Here are the available commands:\n");
              System.out.println("0: Reprint the collections menu");
