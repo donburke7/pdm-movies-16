@@ -79,8 +79,8 @@ public class Recomendations {
                 """
                     select m.title from movie as m
                     join watches as w on m."movieID" = w."movieID"
-                    join follows as f on "userID" = "Follower"
-                    where "Following" = ?
+                    join follows as f on "userID" = "Following"
+                    where "Follower" = ?
                     group by m.title
                     order by count(m.title) desc
                     limit 20;
