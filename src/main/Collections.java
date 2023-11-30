@@ -72,7 +72,17 @@ public class Collections {
                      modifyCollection();
                      break;
                  case 7:
+                     numCollections();
                      break;
+                 case 8:
+                      followsCount();
+                      break;
+                 case 9:
+                      followingCount();
+                      break;
+                 case 10:
+                      topTen();
+                      break;
                  default:
                      System.out.println("Please pick a valid number");
              }
@@ -401,7 +411,7 @@ public class Collections {
     public void numCollections() throws SQLException{
         int collectionCount=0;
         PreparedStatement statement = conn.prepareStatement("select count(*) from \"collection\" where \"userID\" = ?");
-        statment.setInt(1,userID);
+        statement.setInt(1,userID);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()){
             collectionCount=resultSet.getInt(1);
@@ -435,6 +445,7 @@ public class Collections {
             followCount=resultSet.getInt(1);
         }
         System.out.println("You have "+followCount+" followers.");
+
     }
 
     public void topTen() throws SQLException{
@@ -443,15 +454,30 @@ public class Collections {
         System.out.println("2: Filter by most plays");
         System.out.println("3: Filter by both highest rating and most plays");
         System.out.println("Enter the option number you would like to filter by:");
-
+        int option = Integer.parseInt(scanner.nextLine());
+        if(option==2){
+            mostPlays();
+        }
         
 
     }
 
-    public ArrayList<String> mostPlays() throws SQLException{
+    public void mostPlays() throws SQLException{
         ArrayList<String> movieNames = new ArrayList<String>();
+        PreparedStatement statement = conn.prepareStatement("select m.\"title\" from \"movie\" m join \"watches\" w on m.\"movieID\" = w.\"movieID\" where w.\"userID\"=? group by m.\"movieID\" order by count(m.\"movieID\") Desc limit 10");
+        statement.setInt(1,userID);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            movieNames.add(resultSet.getString(1));
+        }
 
-        return movieNames;
+        for(int i=0;i<movieNames.size();i++){
+            System.out.println(movieNames.get(i));
+        }
+        
+    
+
+    
     }
 
 }
