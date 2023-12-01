@@ -140,13 +140,12 @@ public class Accounts {
      */
     public static void printMainMenu() throws SQLException{
         System.out.println("Find below more functionality:\n");
-
         System.out.println("2: Access and Edit Collections"); 
         System.out.println("3: Search for Movies");
         System.out.println("4: Rate Movies");
         System.out.println("5: Watch Movies");
         System.out.println("6: Follow other Users");
-        System.out.println("7: Manage Collections");
+        System.out.println("7: View User Stats");
         System.out.println("8: Recommendations");
         System.out.println("9: Logout");
         int input = 0 ;
@@ -179,8 +178,9 @@ public class Accounts {
                     follow.printMenu();
                     break;
                 case 7:
-                    Collections collection = new Collections(userID,conn);
-                    collection.printMenu();
+                    UserStats stats = new UserStats(userID,conn);
+                    stats.printMenu();
+                    break;
                 case 8:
                     Recomendations recomendations = new Recomendations(conn, userID);
                     recomendations.runRecommendations();

@@ -43,7 +43,6 @@ public class MovieSearch {
                     searchByGenre(connection, scanner);
                     break;
                 case 9:
-                    System.out.println("Going back to main menu now");
                     break;
                 default:
                     System.out.println("Invalid input");
