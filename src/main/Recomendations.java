@@ -112,9 +112,10 @@ public class Recomendations {
     }
 
     private void forYou() throws SQLException {
-        // the first query selects a users top five movies, then looks at who watched those, and selects those
+        // the first query selects a user's top five movies, then looks at who watched those, and selects those
         // users top movies
-        // the second query selects a users
+        // the second query selects movies where there is an actor that is in the users top 5 movies
+        // the last query selects movies where from the users most watched genres
         PreparedStatement preparedStatement = connection.prepareStatement(
                 """
                         (select m."title" from watches as w
@@ -150,7 +151,7 @@ public class Recomendations {
                                                                                         where "userID" = ?)
                                                     group by c.genreid
                                                     order by count(c.genreid)
-                                                    limit 3)
+                                                    limit 5)
                             group by m.title, r."releaseDate"
                             order by r."releaseDate" desc
                             limit 5)
