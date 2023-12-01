@@ -452,8 +452,8 @@ public class Collections {
     public void topTen() throws SQLException{
         System.out.println("Here is the Top 10 filter options:");
         System.out.println("1: Filter by highest rating");
-        System.out.println("2: Filter by most plays");
-        System.out.println("3: Filter by both highest rating and most plays");
+        System.out.println("2: Filter by most watched");
+        System.out.println("3: Filter by both highest rating and most watched");
         System.out.println("Enter the option number you would like to filter by:");
         int option = Integer.parseInt(scanner.nextLine());
         if(option==1){
@@ -461,6 +461,9 @@ public class Collections {
         }
         else if(option==2){
             mostPlays();
+        }
+        else if(option==3){
+            combination();
         }
         
 
@@ -484,7 +487,7 @@ public class Collections {
 
     public void bestRated() throws SQLException{
         ArrayList<String> movieNames = new ArrayList<String>();
-        PreparedStatement statement = conn.prepareStatement("select m.\"title\" from \"movie\" m join \"rates\" r on m.\"movieID\" = r.\"movieid\" where r.\"userid\"=? group by m.\"movieID\" order by count(r.\"rating\") Desc limit 10");
+        PreparedStatement statement = conn.prepareStatement("select m.\"title\" from \"movie\" m join \"rates\" r on m.\"movieID\" = r.\"movieid\" where r.\"userid\"=? group by m.\"movieID\" order by max(r.\"rating\") Desc limit 10");
         statement.setInt(1,userID);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()){
@@ -498,5 +501,20 @@ public class Collections {
         }
     }
 
+    public void combination() throws SQLException{
+        ArrayList<String> movieNames = new ArrayList<String>();
+        PreparedStatement statement = conn.prepareStatement("select m.\"title\" from \"movie\" m join \"rates\" r on m.\"movieID\" = r.\"movieid\" join \"watches\" w on m.\"movieID\" = w.\"movieID\" where r.\"userid\"=? group by m.\"movieID\" order by count(m.\"movieID\"),max(r.\"rating\") Desc limit 10");
+        statement.setInt(1,userID);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            movieNames.add(resultSet.getString(1));
+        }
+
+        System.out.println("\nHere are your top ten movies by top rated and most watched:");
+        for(int i=0;i<movieNames.size();i++){
+            System.out.print((i+1)+": ");
+            System.out.println(movieNames.get(i));
+        }
+    }
     
 }
