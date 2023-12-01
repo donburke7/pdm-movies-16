@@ -39,7 +39,7 @@ public class Recomendations {
                     ofThisMonth();
                     break;
                 case 4:
-                    System.out.println("Not implemented yet. Pick again");
+                    forYou();
                     break;
                 case 9:
                     System.out.println("Going back to main menu now");
@@ -105,6 +105,62 @@ public class Recomendations {
                 limit 5;
                 """
         );
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        printResult(resultSet);
+    }
+
+    private void forYou() throws SQLException {
+        // the first query selects a user's top five movies, then looks at who watched those, and selects those
+        // users top movies
+        // the second query selects movies where there is an actor that is in the users top 5 movies
+        // the last query selects movies where from the users most watched genres
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                """
+                        (select m."title" from watches as w
+                            join movie as m on w."movieID" = m."movieID"
+                            where w."userID" in (select distinct w."userID" from watches as w
+                                                    where w."movieID" in (select w."movieID" from watches as w
+                                                                            where w."userID" = ?
+                                                                            group by w."movieID"
+                                                                            order by count(w."movieID") DESC
+                                                                            limit 5))
+                            group by m.title
+                            order by count(m.title)
+                            limit 5)
+                        union
+                        (select m.title from movie as m
+                            join acts_in as a on m."movieID" = a."movieID"
+                            join releases as r on m."movieID" = r."movieID"
+                            where a."contributorID" in (select a."contributorID" from acts_in as a
+                                                            where a."movieID" in (select w."movieID" from watches as w
+                                                                                                where "userID" = ?)
+                                                            group by a."contributorID"
+                                                            order by count(a."contributorID") desc
+                                                            limit 5)
+                            group by m.title, r."releaseDate"
+                            order by r."releaseDate" desc
+                            limit 5)
+                        union
+                        (select m.title from movie as m
+                            join classified_by as c on m."movieID" = c.movieid
+                            join releases as r on m."movieID" = r."movieID"
+                            where c.genreid in (select c.genreid from classified_by as c
+                                                    where c.movieid in (select w."movieID" from watches as w
+                                                                                        where "userID" = ?)
+                                                    group by c.genreid
+                                                    order by count(c.genreid)
+                                                    limit 5)
+                            group by m.title, r."releaseDate"
+                            order by r."releaseDate" desc
+                            limit 5)
+                    """
+        );
+
+        preparedStatement.setInt(1, userid);
+        preparedStatement.setInt(2, userid);
+        preparedStatement.setInt(3, userid);
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
