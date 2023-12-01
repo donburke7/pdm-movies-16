@@ -112,6 +112,9 @@ public class Recomendations {
     }
 
     private void forYou() throws SQLException {
+        // the first query selects a users top five movies, then looks at who watched those, and selects those
+        // users top movies
+        // the second query selects a users
         PreparedStatement preparedStatement = connection.prepareStatement(
                 """
                         (select m."title" from watches as w
@@ -138,11 +141,25 @@ public class Recomendations {
                             group by m.title, r."releaseDate"
                             order by r."releaseDate" desc
                             limit 5)
+                        union
+                        (select m.title from movie as m
+                            join classified_by as c on m."movieID" = c.movieid
+                            join releases as r on m."movieID" = r."movieID"
+                            where c.genreid in (select c.genreid from classified_by as c
+                                                    where c.movieid in (select w."movieID" from watches as w
+                                                                                        where "userID" = ?)
+                                                    group by c.genreid
+                                                    order by count(c.genreid)
+                                                    limit 3)
+                            group by m.title, r."releaseDate"
+                            order by r."releaseDate" desc
+                            limit 5)
                     """
         );
 
         preparedStatement.setInt(1, userid);
         preparedStatement.setInt(2, userid);
+        preparedStatement.setInt(3, userid);
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
