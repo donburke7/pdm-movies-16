@@ -44,8 +44,6 @@ public class Collections {
              System.out.println("8: View the number of users who follow you");
              System.out.println("9: View the number of users you follow");
              System.out.println("10: View your top ten movies");
-
-
              System.out.println("11: Return to the main menu\n");
              System.out.println("Enter the number that corresponds to the command you wish to execute:");
              command = Integer.parseInt(scanner.nextLine());
@@ -75,13 +73,16 @@ public class Collections {
                      numCollections();
                      break;
                  case 8:
-                      followsCount();
+                      followingCount();
                       break;
                  case 9:
-                      followingCount();
+                      followsCount();
                       break;
                  case 10:
                       topTen();
+                      break;
+                 case 11:
+                      System.out.println("Going back to main menu now");
                       break;
                  default:
                      System.out.println("Please pick a valid number");
@@ -455,7 +456,10 @@ public class Collections {
         System.out.println("3: Filter by both highest rating and most plays");
         System.out.println("Enter the option number you would like to filter by:");
         int option = Integer.parseInt(scanner.nextLine());
-        if(option==2){
+        if(option==1){
+            bestRated();
+        }
+        else if(option==2){
             mostPlays();
         }
         
@@ -471,13 +475,28 @@ public class Collections {
             movieNames.add(resultSet.getString(1));
         }
 
+        System.out.println("\nHere are your top ten movies by most watched:");
         for(int i=0;i<movieNames.size();i++){
+            System.out.print((i+1)+": ");
             System.out.println(movieNames.get(i));
         }
-        
-    
-
-    
     }
 
+    public void bestRated() throws SQLException{
+        ArrayList<String> movieNames = new ArrayList<String>();
+        PreparedStatement statement = conn.prepareStatement("select m.\"title\" from \"movie\" m join \"rates\" r on m.\"movieID\" = r.\"movieid\" where r.\"userid\"=? group by m.\"movieID\" order by count(r.\"rating\") Desc limit 10");
+        statement.setInt(1,userID);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            movieNames.add(resultSet.getString(1));
+        }
+
+        System.out.println("\nHere are your top ten movies by top rated:");
+        for(int i=0;i<movieNames.size();i++){
+            System.out.print((i+1)+": ");
+            System.out.println(movieNames.get(i));
+        }
+    }
+
+    
 }
