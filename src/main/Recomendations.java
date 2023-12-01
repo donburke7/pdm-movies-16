@@ -39,7 +39,7 @@ public class Recomendations {
                     ofThisMonth();
                     break;
                 case 4:
-                    System.out.println("Not implemented yet. Pick again");
+                    forYou();
                     break;
                 case 9:
                     System.out.println("Going back to main menu now");
@@ -79,8 +79,8 @@ public class Recomendations {
                 """
                     select m.title from movie as m
                     join watches as w on m."movieID" = w."movieID"
-                    join follows as f on "userID" = "Follower"
-                    where "Following" = ?
+                    join follows as f on "userID" = "Following"
+                    where "Follower" = ?
                     group by m.title
                     order by count(m.title) desc
                     limit 20;
@@ -105,6 +105,44 @@ public class Recomendations {
                 limit 5;
                 """
         );
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        printResult(resultSet);
+    }
+
+    private void forYou() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                """
+                        (select m."title" from watches as w
+                            join movie as m on w."movieID" = m."movieID"
+                            where w."userID" in (select distinct w."userID" from watches as w
+                                                    where w."movieID" in (select w."movieID" from watches as w
+                                                                            where w."userID" = ?
+                                                                            group by w."movieID"
+                                                                            order by count(w."movieID") DESC
+                                                                            limit 5))
+                            group by m.title
+                            order by count(m.title)
+                            limit 5)
+                        union
+                        (select m.title from movie as m
+                            join acts_in as a on m."movieID" = a."movieID"
+                            join releases as r on m."movieID" = r."movieID"
+                            where a."contributorID" in (select a."contributorID" from acts_in as a
+                                                            where a."movieID" in (select w."movieID" from watches as w
+                                                                                                where "userID" = ?)
+                                                            group by a."contributorID"
+                                                            order by count(a."contributorID") desc
+                                                            limit 5)
+                            group by m.title, r."releaseDate"
+                            order by r."releaseDate" desc
+                            limit 5)
+                    """
+        );
+
+        preparedStatement.setInt(1, userid);
+        preparedStatement.setInt(2, userid);
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
