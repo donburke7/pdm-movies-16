@@ -84,8 +84,8 @@ public class Followers {
 
             }else if (userList.size()==1){
                 statement= conn.prepareStatement("insert into \"follows\" values (?,?)");
-                statement.setInt(1,userList.get(0));
-                statement.setInt(2,userID);
+                statement.setInt(2,userList.get(0));
+                statement.setInt(1,userID);
                 statement.executeUpdate();
             }else{
                 System.out.println("The name you entered had multiple results.");
@@ -101,8 +101,8 @@ public class Followers {
                 System.out.println("Please choose the number that corresponds to the correct email address for the user:");
                 int Userinput = Integer.parseInt(scanner.next());
                 statement=conn.prepareStatement("insert into \"follows\" values(?,?)");
-                statement.setInt(1, Userinput);
-                statement.setInt(2, userID);
+                statement.setInt(2, Userinput);
+                statement.setInt(1, userID);
                 statement.executeUpdate();
             }
 
@@ -121,8 +121,8 @@ public class Followers {
                 System.out.println("sorry the email you entered does not have an account :(");
             }else{
                 statement=conn.prepareStatement("insert into \"follows\" values(?,?)");
-                statement.setInt(1,following);
-                statement.setInt(2, userID);
+                statement.setInt(2,following);
+                statement.setInt(1, userID);
                 statement.executeUpdate();
             }
         }
@@ -160,8 +160,8 @@ public class Followers {
 
             }else if (userList.size()==1){
                 statement= conn.prepareStatement("delete from \"follows\" where \"Following\"=? and \"Follower\"=?");
-                statement.setInt(1,userList.get(0));
-                statement.setInt(2,userID);
+                statement.setInt(2,userList.get(0));
+                statement.setInt(1,userID);
                 statement.executeUpdate();
             }else{
                 System.out.println("The name you entered had multiple results.");
@@ -177,8 +177,8 @@ public class Followers {
                 System.out.println("Please choose the number that corresponds to the correct email address for the user:");
                 int Userinput = Integer.parseInt(scanner.next());
                 statement=conn.prepareStatement("delete from \"follows\" where \"Following\"=? and \"Follower\"=?");
-                statement.setInt(1, Userinput);
-                statement.setInt(2, userID);
+                statement.setInt(2, Userinput);
+                statement.setInt(1, userID);
                 statement.executeUpdate();
             }
 
@@ -196,8 +196,8 @@ public class Followers {
                 System.out.println("sorry the email you entered does not have an account :(");
             }else{
                 statement=conn.prepareStatement("delete from \"follows\" where \"Following\"=? and \"Follower\"=?");
-                statement.setInt(1,following);
-                statement.setInt(2, userID);
+                statement.setInt(2,following);
+                statement.setInt(1, userID);
                 statement.executeUpdate();
             }
         }
