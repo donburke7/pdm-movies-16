@@ -78,7 +78,7 @@ public class UserStats {
      */
     public void followsCount() throws SQLException{
         int followCount=0;
-        PreparedStatement statement = conn.prepareStatement("select count(*) from \"follows\" where \"Follower\"=?");
+        PreparedStatement statement = conn.prepareStatement("select count(*) from \"follows\" where \"Following\"=?");
         statement.setInt(1,userID);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()){
@@ -92,7 +92,7 @@ public class UserStats {
      */
     public void followingCount() throws SQLException{
         int followCount=0;
-        PreparedStatement statement = conn.prepareStatement("select count(*) from \"follows\" where \"Following\"=?");
+        PreparedStatement statement = conn.prepareStatement("select count(*) from \"follows\" where \"Follower\"=?");
         statement.setInt(1,userID);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()){
@@ -156,7 +156,7 @@ public class UserStats {
 
     public void combination() throws SQLException{
         ArrayList<String> movieNames = new ArrayList<String>();
-        PreparedStatement statement = conn.prepareStatement("select m.\"title\" from \"movie\" m join \"rates\" r on m.\"movieID\" = r.\"movieid\" join \"watches\" w on m.\"movieID\" = w.\"movieID\" where r.\"userid\"=? group by m.\"movieID\" order by count(m.\"movieID\"),max(r.\"rating\") Desc limit 10");
+        PreparedStatement statement = conn.prepareStatement("select m.\"title\" from \"movie\" m join \"rates\" r on m.\"movieID\" = r.\"movieid\" join \"watches\" w on m.\"movieID\" = w.\"movieID\" where r.\"userid\"=? group by m.\"movieID\" order by count(w.\"movieID\"),max(r.\"rating\") Desc limit 10");
         statement.setInt(1,userID);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()){
